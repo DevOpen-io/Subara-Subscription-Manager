@@ -7,6 +7,8 @@
 		"dark": "Dark",
 		"system": "System",
 		"select_theme": "Select Theme",
+		"color_scheme": "Color Scheme",
+		"select_color_scheme": "Select Color Scheme",
 		"currency": "Currency",
 		"currency_unit": "Currency Unit",
 		"select_currency": "Select Currency",
@@ -26,7 +28,12 @@
 		"delete_confirm": "Remove {}?",
 		"cancel": "Cancel",
 		"delete": "Delete",
-		"renews_info": "Renews {} • {}"
+		"renews_info": "Renews {} • {}",
+		"renews_today_alert_title": "Renews today",
+		"renews_today_alert_subtitle": "{} subscription(s) renew today",
+		"renews_today_badge": "Today",
+		"sort_soonest": "Soonest",
+		"sort_default": "Default"
 	},
 	"frequency": {
 		"daily": "Daily",
@@ -41,8 +48,6 @@
 		}
 	},
 	"intro": {
-		"title": "Welcome to\nSubZilla",
-		"subtitle": "Track all your subscriptions in one place.\nNever miss a payment again.",
 		"name_title": "What should we\ncall you?",
 		"name_label": "Your Name",
 		"name_hint": "John Doe",
@@ -63,7 +68,21 @@
 		"connect_gravatar": "Connect Gravatar",
 		"username_saved": "User Name Saved!",
 		"email_saved": "Email Saved!",
-		"username_label": "User Name"
+		"username_label": "User Name",
+		"eyebrow": "WELCOME TO SUBZILLA",
+		"headline": "Take back control of every",
+		"headline_accent": "recurring charge.",
+		"subtitle": "Track subscriptions, see what's renewing, and stay on top of your budget — all stored privately on your device.",
+		"get_started": "Get started",
+		"already_user": "Already a user?",
+		"restore_backup": "Restore from backup",
+		"color_scheme_eyebrow": "APPEARANCE",
+		"color_scheme_title": "Pick your color",
+		"color_scheme_subtitle": "You can change this anytime in settings.",
+		"popular_eyebrow": "POPULAR SUBSCRIPTIONS",
+		"popular_title": "Add your favorites",
+		"popular_subtitle": "Tap + to add any. Skip to set up later.",
+		"popular_cta": "Get started"
 	},
 	"common": {
 		"back": "Back",
@@ -74,6 +93,7 @@
 	},
 	"dialogs": {
 		"add_title": "Add Subscription",
+		"new_sub_title": "New Subscription",
 		"edit_title": "Edit Subscription",
 		"custom_color": "Custom color",
 		"cancel": "Cancel",
@@ -81,8 +101,11 @@
 		"brand_label": "Brand or custom name",
 		"required": "Required",
 		"amount_label": "Amount",
+		"price_label": "Price",
 		"invalid_number": "Enter a valid number",
 		"start_date": "Start date",
+		"first_charge": "First charge",
+		"cycle_label": "Cycle",
 		"frequency_label": "Frequency",
 		"slice_color": "Slice color",
 		"custom_color_selected": "Custom color selected",
@@ -91,7 +114,11 @@
 		"save_btn": "Save",
 		"close_btn": "Close",
 		"error_loading": "Error loading brands: {}",
-		"selected_tooltip": "Selected: {}"
+		"selected_tooltip": "Selected: {}",
+		"name_label": "Name",
+		"search_placeholder": "Search {}+ services",
+		"popular": "POPULAR",
+		"or_enter_manually": "OR ENTER MANUALLY"
 	},
 	"menu": {
 		"main_menu": "Main Menu",
@@ -104,6 +131,8 @@
 		"export": "Export Subscriptions",
 		"import": "Import Subscriptions",
 		"about": "About",
+		"privacy_policy": "Privacy Policy",
+		"terms_conditions": "Terms & Conditions",
 		"about_desc": "An open source application that allows you to easily track your subscriptions.",
 		"view_github": "View on GitHub",
 		"export_success": "Subscriptions exported successfully!",
@@ -120,17 +149,44 @@
 		"no_data": "No subscription data to analyze yet.",
 		"title": "Subscription Analytics",
 		"summary": "Summary",
-		"total_monthly": "Total Monthly Spending",
-		"active_subs": "Active Subscriptions",
-		"avg_cost": "Average Monthly Cost",
+		"total_monthly": "Monthly Total",
+		"total_quarterly": "3-Month Total",
+		"total_yearly": "Annual Total",
+		"active_subs": "Active Subs",
+		"avg_cost": "Avg. Cost",
 		"breakdown": "Breakdown by Subscription",
 		"per_month": "/mo",
-		"percent_total": "% of total"
+		"percent_total": "% of total",
+		"period_month": "Month",
+		"period_quarter": "3 Months",
+		"period_year": "Year"
 	},
 	"frequency_names": {
 		"daily": "DAILY",
 		"weekly": "WEEKLY",
 		"monthly": "MONTHLY",
 		"yearly": "YEARLY"
+	},
+	"detail": {
+		"back": "Subs",
+		"active": "Active",
+		"cost": "COST",
+		"per_frequency": "per {}",
+		"next_charge": "NEXT CHARGE",
+		"in_days": "in {} days",
+		"today": "today",
+		"section_details": "DETAILS",
+		"section_history": "PAYMENT HISTORY",
+		"see_all": "See all",
+		"billing_cycle": "Billing cycle",
+		"started": "Started",
+		"payment_method": "Payment method",
+		"category": "Category",
+		"reminder": "Reminder",
+		"not_set": "—",
+		"delete": "Delete Subscription",
+		"delete_confirm": "Are you sure you want to delete {}?",
+		"delete_action": "Delete",
+		"cancel": "Cancel"
 	}
 }

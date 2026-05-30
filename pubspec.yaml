@@ -1,8 +1,8 @@
 name: subs_tracker
-description: "A new Flutter project."
+description: "SubZilla is a powerful and intuitive Flutter application designed to help you manage your monthly subscriptions, track recurring expenses, and stay in control of your budget."
 publish_to: 'none'
 
-version: 1.0.0+73
+version: 0.0.2+2
 
 environment:
   sdk: ^3.10.7
@@ -17,8 +17,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.8
-  package_info_plus: ^9.0.0
+  cupertino_icons: ^1.0.9
+  package_info_plus: ^9.0.1
   flutter_launcher_icons: ^0.14.4
   fl_chart: ^1.1.1
   flutter_riverpod: ^3.1.0
@@ -42,11 +42,15 @@ dependencies:
   path_provider: ^2.1.5
   simple_gravatar_fetch: ^2.0.4+1
   file_picker: ^10.3.10
-  share_plus: ^12.0.1
+  share_plus: ^12.0.2
   crypto: ^3.0.7
-  shared_preferences: ^2.5.3
+  shared_preferences: ^2.5.5
   easy_localization: ^3.0.8
   simple_icons: ^14.6.1
+
+dependency_overrides:
+  simple_icons:
+    path: ./packages/simple_icons
 
 dev_dependencies:
   flutter_test:

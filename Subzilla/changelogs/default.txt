@@ -1,0 +1,8 @@
+What's new in SubZilla:
+
+• Track and manage all your subscriptions in one place
+• Visual analytics with interactive spending charts
+• Calendar view for upcoming payments
+• Smart notifications before payment due dates
+• Dark mode, custom themes, and currency settings
+• Available in English and Turkish

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:riverpod_annotation/experimental/json_persist.dart';
@@ -44,6 +45,10 @@ class SettingsController extends _$SettingsController {
 
   void updateTheme(ThemeMode mode) {
     state = AsyncData(state.value!.copyWith(theme: mode));
+  }
+
+  void updateColorScheme(FlexScheme scheme) {
+    state = AsyncData(state.value!.copyWith(colorScheme: scheme));
   }
 
   void updateCurrency(Currency currency) {

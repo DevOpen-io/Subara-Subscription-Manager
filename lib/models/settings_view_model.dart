@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -30,29 +31,40 @@ abstract class SettingsViewModel with _$SettingsViewModel {
     String? userName,
     String? email,
     bool? isFirstTime,
+    @FlexSchemeConverter()
+    @Default(FlexScheme.bahamaBlue)
+    FlexScheme colorScheme,
   }) = _SettingsViewModel;
 
   factory SettingsViewModel.fromJson(Map<String, dynamic> json) =>
       _$SettingsViewModelFromJson(json);
-
 }
 
-/// Converts to and from [Uint8List] and [List]<[int]>.
 class Uint8ListConverter implements JsonConverter<Uint8List?, List?> {
-  /// Create a new instance of [Uint8ListConverter].
   const Uint8ListConverter();
 
   @override
   Uint8List? fromJson(List? json) {
     if (json == null) return null;
-
     return Uint8List.fromList(List.from(json));
   }
 
   @override
   List<int>? toJson(Uint8List? object) {
     if (object == null) return null;
-
     return object.toList();
   }
+}
+
+class FlexSchemeConverter implements JsonConverter<FlexScheme, String> {
+  const FlexSchemeConverter();
+
+  @override
+  FlexScheme fromJson(String json) => FlexScheme.values.firstWhere(
+        (e) => e.name == json,
+        orElse: () => FlexScheme.bahamaBlue,
+      );
+
+  @override
+  String toJson(FlexScheme object) => object.name;
 }

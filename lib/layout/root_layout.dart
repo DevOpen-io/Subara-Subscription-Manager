@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:subs_tracker/config/router_config.dart';
-import 'package:subs_tracker/models/sub_slice.dart';
 import 'package:subs_tracker/widgets/add_subs_dialog.dart';
 import 'package:subs_tracker/widgets/menu_bar.dart';
 
@@ -29,6 +28,7 @@ class RootLayout extends ConsumerWidget {
     }
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           appBar: AppBar(
                   title: Text("settings.app_name".tr()),
                   actions: [
@@ -36,12 +36,17 @@ class RootLayout extends ConsumerWidget {
                       visible: currentPath == Routes.home.route,
                       child: IconButton(
                         icon: const Icon(Icons.add),
-                        onPressed: () async {
-                          await showAdaptiveDialog<SubSlice>(
-                            context: context,
-                            builder: (_) => const AddSubsDialog(),
-                          );
-                        },
+                        onPressed: () => showModalBottomSheet<void>(
+                          context: context,
+                          isScrollControlled: true,
+                          useSafeArea: true,
+                          builder: (ctx) => Padding(
+                            padding: EdgeInsets.only(
+                              bottom: MediaQuery.of(ctx).viewInsets.bottom,
+                            ),
+                            child: const AddSubsSheet(),
+                          ),
+                        ),
                       ),
                     ),
                   ],

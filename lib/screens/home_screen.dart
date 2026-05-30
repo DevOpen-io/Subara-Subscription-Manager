@@ -1,13 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:subs_tracker/config/router_config.dart';
 import 'package:subs_tracker/models/settings_view_model.dart';
 import 'package:subs_tracker/models/sub_slice.dart';
 import 'package:subs_tracker/providers/settings_controller.dart';
 import 'package:subs_tracker/providers/subs_controller.dart';
 import 'package:subs_tracker/widgets/add_subs_dialog.dart';
 import 'package:subs_tracker/widgets/brand_logo.dart';
-import 'package:subs_tracker/widgets/edit_subs_dialog.dart';
 
 class HomeScreen extends HookConsumerWidget {
   const HomeScreen({super.key});
@@ -17,14 +18,16 @@ class HomeScreen extends HookConsumerWidget {
     final slicesAsync = ref.watch(subsControllerProvider);
     final settingsAsync = ref.watch(settingsControllerProvider);
 
-    return slicesAsync.when(
-      data: (slices) => settingsAsync.when(
-        data: (settings) => buildBody(slices, settings, context, ref),
+    return Scaffold(
+      body: slicesAsync.when(
+        data: (slices) => settingsAsync.when(
+          data: (settings) => buildBody(slices, settings, context, ref),
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => Center(child: Text('Error: $err')),
+        ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, stack) => Center(child: Text('Error: $err')),
     );
   }
 
@@ -41,12 +44,17 @@ class HomeScreen extends HookConsumerWidget {
             Center(child: Text("home.no_subs".tr())),
             const SizedBox(height: 12),
             TextButton(
-              onPressed: () {
-                showAdaptiveDialog<SubSlice>(
-                  context: context,
-                  builder: (_) => const AddSubsDialog(),
-                );
-              },
+              onPressed: () => showModalBottomSheet<void>(
+                context: context,
+                isScrollControlled: true,
+                useSafeArea: true,
+                builder: (ctx) => Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(ctx).viewInsets.bottom,
+                  ),
+                  child: const AddSubsSheet(),
+                ),
+              ),
               child: Text("home.add_sub".tr()),
             ),
           ],
@@ -254,12 +262,9 @@ class _CompactSubscriptionTile extends ConsumerWidget {
         ),
         child: GestureDetector(
           onTap: () {
-            showAdaptiveDialog<void>(
-              context: context,
-              builder: (_) => EditSubsDialog(
-                slice: slice,
-                index: index,
-              ),
+            context.push(
+              Routes.subscription.route,
+              extra: {'slice': slice, 'index': index},
             );
           },
           child: Container(

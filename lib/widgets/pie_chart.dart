@@ -36,10 +36,11 @@ class _SubsPieState extends ConsumerState<SubsPie> {
         AspectRatio(
           aspectRatio: 1.2,
           child: PieChart(
+            
             key: ValueKey(slices.hashCode),
             PieChartData(
-              sectionsSpace: 2,
-              centerSpaceRadius: 0,
+              sectionsSpace: 5,
+              centerSpaceRadius: 25,
               pieTouchData: PieTouchData(
                 touchCallback: (event, response) {
                   setState(() {
@@ -62,13 +63,13 @@ class _SubsPieState extends ConsumerState<SubsPie> {
                     fontWeight: FontWeight.w800,
                     color: darkerOf(Color(s.color), 0.4),
                   ),
-                  radius: isTouched ? 150 : 130,
+                  radius: isTouched ? 120 : 100,
                   badgeWidget: _Badge(
                     label: label,
                     brand: s.brand,
                     borderColor: Color(s.color),
                   ),
-                  badgePositionPercentageOffset: 0.95,
+                  badgePositionPercentageOffset: 1.15,
                 );
               }),
             ),
@@ -90,7 +91,7 @@ class _Badge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(minHeight: 28, minWidth: 56),
+      constraints: const BoxConstraints(minHeight: 25, minWidth: 30),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(10),
@@ -103,14 +104,12 @@ class _Badge extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         child: brand != null ? BrandLogo(
           brand: brand,
-          size: 28,
+          size: 25,
         ) :
-                    Flexible(
-        child: Text(
-          label,
-          overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).textTheme.labelMedium,
-        ),
+                    Text(
+                      label,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.labelMedium,
                     ),
       ),
     );

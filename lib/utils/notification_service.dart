@@ -9,6 +9,7 @@ abstract class NotificationService {
     required String title,
     required String body,
     required DateTime scheduledDate,
+    DateTimeComponents? matchDateTimeComponents,
   });
   Future<void> cancelNotification(int id);
   Future<void> cancelAllNotifications();
@@ -64,6 +65,7 @@ class LocalNotificationService implements NotificationService {
     required String title,
     required String body,
     required DateTime scheduledDate,
+    DateTimeComponents? matchDateTimeComponents,
   }) async {
     await flutterLocalNotificationsPlugin.zonedSchedule(
       id,
@@ -80,7 +82,7 @@ class LocalNotificationService implements NotificationService {
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.dayOfMonthAndTime,
+      matchDateTimeComponents: matchDateTimeComponents,
     );
   }
 

@@ -33,7 +33,7 @@ android {
     defaultConfig {
         applicationId = "io.devopen.subzilla"
         minSdk = flutter.minSdkVersion
-        targetSdk = 33
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true
@@ -58,6 +58,9 @@ android {
                 storePassword = System.getenv("KEY_STORE_PASSWORD")
                 keyAlias = System.getenv("ALIAS")
                 keyPassword = System.getenv("KEY_PASSWORD")
+            }
+            else {
+                println("Warning: Keystore properties not found. Release signing will be skipped.")
             }
         }
     }

@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'
+    show DateTimeComponents;
 import 'package:path/path.dart';
 import 'package:riverpod_annotation/experimental/json_persist.dart';
 import 'package:riverpod_annotation/experimental/persist.dart';
@@ -14,11 +16,11 @@ import 'package:timezone/timezone.dart' as tz;
 
 part 'subs_controller.g.dart';
 
-/// There is a limit imposed by iOS where it will only keep the 64 notifications
-/// that were last set on any iOS versions newer than 9. On iOS versions 9 and older,
-/// the 64 notifications that fire soonest are kept.
-/// See https://developer.apple.com/documentation/uikit/uilocalnotification.
-int maxNotifications = 64;
+// Clamps day to the last valid day of the given month (handles Feb, 30-day months, etc.)
+int _clampDay(int year, int month, int day) {
+  final lastDay = DateTime(year, month + 1, 0).day;
+  return day.clamp(1, lastDay);
+}
 
 @riverpod
 Future<JsonSqFliteStorage> subsStorage(Ref ref) async {
@@ -43,187 +45,102 @@ class SubsController extends _$SubsController {
         destroyKey: "v2",
       ),
     ).future;
-    scheduleNotification();
+    await scheduleNotification();
     return state.value ?? [];
   }
 
   void addSlice(SubSlice slice) {
     state = AsyncValue.data(List.of(state.value ?? [])..add(slice));
+    scheduleNotification();
   }
 
-  void scheduleNotification() {
-    debugPrint("Cancelling all notifications and scheduling new ones.");
-    LocalNotificationService.instance.cancelAllNotifications();
-    debugPrint(
-      "Scheduling notifications for ${state.value?.length} subscriptions.",
-    );
-    for (final slice in state.value ?? []) {
-      scheduleRepeatingNotification(slice, state.value?.length ?? 0);
+  Future<void> scheduleNotification() async {
+    await LocalNotificationService.instance.cancelAllNotifications();
+    final subs = state.value ?? [];
+    for (int i = 0; i < subs.length; i++) {
+      await scheduleRepeatingNotification(subs[i], i);
     }
   }
 
-  Future<void> scheduleRepeatingNotification(
-    SubSlice slice,
-    int sliceCount,
-  ) async {
-    if (sliceCount == 0) return;
+  Future<void> scheduleRepeatingNotification(SubSlice slice, int index) async {
     final now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduledDate = tz.TZDateTime(
-      tz.local,
-      now.year,
-      now.month,
-      slice.startDate.day,
-      12, // 12 PM
-      0,
-      0,
-    );
 
-    // Adjust scheduledDate based on frequency
+    // Compute the next due date for this subscription
+    tz.TZDateTime nextDate;
+    DateTimeComponents repeatComponents;
+
     switch (slice.frequency) {
       case Frequency.daily:
-        scheduledDate = tz.TZDateTime(
-          tz.local,
-          now.year,
-          now.month,
-          now.day,
-          12,
-          0,
-          0,
-        );
-        if (scheduledDate.isBefore(now)) {
-          scheduledDate = scheduledDate.add(const Duration(days: 1));
+        nextDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, 12, 0, 0);
+        if (nextDate.isBefore(now)) {
+          nextDate = nextDate.add(const Duration(days: 1));
         }
+        repeatComponents = DateTimeComponents.time;
         break;
       case Frequency.weekly:
-        // Find next occurrence of the start day of week
-        scheduledDate = tz.TZDateTime(
-          tz.local,
-          now.year,
-          now.month,
-          now.day,
-          12,
-          0,
-          0,
-        );
-        while (scheduledDate.weekday != slice.startDate.weekday ||
-            scheduledDate.isBefore(now)) {
-          scheduledDate = scheduledDate.add(const Duration(days: 1));
+        nextDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, 12, 0, 0);
+        while (nextDate.weekday != slice.startDate.weekday || nextDate.isBefore(now)) {
+          nextDate = nextDate.add(const Duration(days: 1));
         }
+        repeatComponents = DateTimeComponents.dayOfWeekAndTime;
         break;
       case Frequency.monthly:
-        scheduledDate = tz.TZDateTime(
-          tz.local,
-          now.year,
-          now.month,
-          slice.startDate.day,
-          12,
-          0,
-          0,
-        );
-        if (scheduledDate.isBefore(now)) {
-          scheduledDate = tz.TZDateTime(
-            tz.local,
-            now.year,
-            now.month + 1,
-            slice.startDate.day,
-            12,
-            0,
-            0,
-          );
+        final curDay = _clampDay(now.year, now.month, slice.startDate.day);
+        nextDate = tz.TZDateTime(tz.local, now.year, now.month, curDay, 12, 0, 0);
+        if (nextDate.isBefore(now)) {
+          final nextMonth = now.month == 12 ? 1 : now.month + 1;
+          final nextYear = now.month == 12 ? now.year + 1 : now.year;
+          final nextDay = _clampDay(nextYear, nextMonth, slice.startDate.day);
+          nextDate = tz.TZDateTime(tz.local, nextYear, nextMonth, nextDay, 12, 0, 0);
         }
+        repeatComponents = DateTimeComponents.dayOfMonthAndTime;
         break;
       case Frequency.yearly:
-        scheduledDate = tz.TZDateTime(
-          tz.local,
-          now.year,
-          slice.startDate.month,
-          slice.startDate.day,
-          12,
-          0,
-          0,
-        );
-        if (scheduledDate.isBefore(now)) {
-          scheduledDate = tz.TZDateTime(
-            tz.local,
-            now.year + 1,
-            slice.startDate.month,
-            slice.startDate.day,
-            12,
-            0,
-            0,
-          );
+        nextDate = tz.TZDateTime(tz.local, now.year, slice.startDate.month, slice.startDate.day, 12, 0, 0);
+        if (nextDate.isBefore(now)) {
+          nextDate = tz.TZDateTime(tz.local, now.year + 1, slice.startDate.month, slice.startDate.day, 12, 0, 0);
         }
+        repeatComponents = DateTimeComponents.dateAndTime;
         break;
     }
 
-    /// slice count -> 20
-    /// 64/20 = 3.2 - 64 ~/ 20 = 3
-    /// 64 max means 64 ~/ 20 = 3 notifications per slice
-    int countPerSlice = maxNotifications ~/ sliceCount ~/ 2;
+    final idDue = index * 2;
+    final idDueTomorrow = index * 2 + 1;
 
-    /// Schedule the notifications
-    for (int i = 0; i < countPerSlice; i++) {
-      /// Unique IDs for each notification
-      final id1 = slice.hashCode + i;
-      final id2 = slice.hashCode + i + countPerSlice;
-      
-      tz.TZDateTime nextDate = scheduledDate;
-      switch (slice.frequency) {
-        case Frequency.daily:
-          nextDate = scheduledDate.add(Duration(days: i));
-          break;
-        case Frequency.weekly:
-          nextDate = scheduledDate.add(Duration(days: i * 7));
-          break;
-        case Frequency.monthly:
-          nextDate = tz.TZDateTime(
-            tz.local,
-            scheduledDate.year,
-            scheduledDate.month + i,
-            scheduledDate.day,
-            12,
-            0,
-            0,
-          );
-          break;
-        case Frequency.yearly:
-          nextDate = tz.TZDateTime(
-            tz.local,
-            scheduledDate.year + i,
-            scheduledDate.month,
-            scheduledDate.day,
-            12,
-            0,
-            0,
-          );
-          break;
-      }
+    // "Due today" — repeats at the correct cadence
+    await LocalNotificationService.instance.scheduleNotification(
+      id: idDue,
+      title: "Subscription Reminder",
+      body: "Your ${slice.name} subscription is due today.",
+      scheduledDate: nextDate,
+      matchDateTimeComponents: repeatComponents,
+    );
 
-      LocalNotificationService.instance.scheduleNotification(
-        id: id1,
+    // "Due tomorrow" — skip for daily (every day is "tomorrow")
+    if (slice.frequency != Frequency.daily) {
+      await LocalNotificationService.instance.scheduleNotification(
+        id: idDueTomorrow,
         title: "Subscription Reminder",
-        body: "Your subscription for ${slice.name} is due tomorrow.",
+        body: "Your ${slice.name} subscription is due tomorrow.",
         scheduledDate: nextDate.subtract(const Duration(days: 1)),
-      );
-      LocalNotificationService.instance.scheduleNotification(
-        id: id2,
-        title: "Subscription Reminder",
-        body: "Your subscription for ${slice.name} is due.",
-        scheduledDate: nextDate,
+        matchDateTimeComponents: repeatComponents,
       );
     }
   }
 
   void removeAt(int index) {
     state = AsyncValue.data(List.of(state.value ?? [])..removeAt(index));
+    scheduleNotification();
   }
 
   void updateAt(int index, SubSlice updated) {
     state = AsyncValue.data(List.of(state.value ?? [])..[index] = updated);
+    scheduleNotification();
   }
 
   void clear() {
     state = AsyncValue.data([]);
+    scheduleNotification();
   }
 
   /// Export subscriptions to JSON format
@@ -249,7 +166,7 @@ class SubsController extends _$SubsController {
           .toList();
       // Replace current subscriptions with imported ones
       state = AsyncValue.data(importedSubs);
-      scheduleNotification();
+      await scheduleNotification();
       return true;
     } catch (e) {
       debugPrint('Error importing subscriptions: $e');

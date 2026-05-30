@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SettingsViewModel {
 
- ThemeMode get theme; Currency get currency;@Uint8ListConverter() Uint8List? get profilePicture; String? get userName; String? get email; bool? get isFirstTime;
+ ThemeMode get theme; Currency get currency;@Uint8ListConverter() Uint8List? get profilePicture; String? get userName; String? get email; bool? get isFirstTime;@FlexSchemeConverter() FlexScheme get colorScheme;
 /// Create a copy of SettingsViewModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $SettingsViewModelCopyWith<SettingsViewModel> get copyWith => _$SettingsViewMode
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SettingsViewModel&&(identical(other.theme, theme) || other.theme == theme)&&(identical(other.currency, currency) || other.currency == currency)&&const DeepCollectionEquality().equals(other.profilePicture, profilePicture)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.email, email) || other.email == email)&&(identical(other.isFirstTime, isFirstTime) || other.isFirstTime == isFirstTime));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SettingsViewModel&&(identical(other.theme, theme) || other.theme == theme)&&(identical(other.currency, currency) || other.currency == currency)&&const DeepCollectionEquality().equals(other.profilePicture, profilePicture)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.email, email) || other.email == email)&&(identical(other.isFirstTime, isFirstTime) || other.isFirstTime == isFirstTime)&&(identical(other.colorScheme, colorScheme) || other.colorScheme == colorScheme));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,theme,currency,const DeepCollectionEquality().hash(profilePicture),userName,email,isFirstTime);
+int get hashCode => Object.hash(runtimeType,theme,currency,const DeepCollectionEquality().hash(profilePicture),userName,email,isFirstTime,colorScheme);
 
 @override
 String toString() {
-  return 'SettingsViewModel(theme: $theme, currency: $currency, profilePicture: $profilePicture, userName: $userName, email: $email, isFirstTime: $isFirstTime)';
+  return 'SettingsViewModel(theme: $theme, currency: $currency, profilePicture: $profilePicture, userName: $userName, email: $email, isFirstTime: $isFirstTime, colorScheme: $colorScheme)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $SettingsViewModelCopyWith<$Res>  {
   factory $SettingsViewModelCopyWith(SettingsViewModel value, $Res Function(SettingsViewModel) _then) = _$SettingsViewModelCopyWithImpl;
 @useResult
 $Res call({
- ThemeMode theme, Currency currency,@Uint8ListConverter() Uint8List? profilePicture, String? userName, String? email, bool? isFirstTime
+ ThemeMode theme, Currency currency,@Uint8ListConverter() Uint8List? profilePicture, String? userName, String? email, bool? isFirstTime,@FlexSchemeConverter() FlexScheme colorScheme
 });
 
 
@@ -65,7 +65,7 @@ class _$SettingsViewModelCopyWithImpl<$Res>
 
 /// Create a copy of SettingsViewModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? theme = null,Object? currency = null,Object? profilePicture = freezed,Object? userName = freezed,Object? email = freezed,Object? isFirstTime = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? theme = null,Object? currency = null,Object? profilePicture = freezed,Object? userName = freezed,Object? email = freezed,Object? isFirstTime = freezed,Object? colorScheme = null,}) {
   return _then(_self.copyWith(
 theme: null == theme ? _self.theme : theme // ignore: cast_nullable_to_non_nullable
 as ThemeMode,currency: null == currency ? _self.currency : currency // ignore: cast_nullable_to_non_nullable
@@ -73,7 +73,8 @@ as Currency,profilePicture: freezed == profilePicture ? _self.profilePicture : p
 as Uint8List?,userName: freezed == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String?,isFirstTime: freezed == isFirstTime ? _self.isFirstTime : isFirstTime // ignore: cast_nullable_to_non_nullable
-as bool?,
+as bool?,colorScheme: null == colorScheme ? _self.colorScheme : colorScheme // ignore: cast_nullable_to_non_nullable
+as FlexScheme,
   ));
 }
 
@@ -158,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ThemeMode theme,  Currency currency, @Uint8ListConverter()  Uint8List? profilePicture,  String? userName,  String? email,  bool? isFirstTime)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( ThemeMode theme,  Currency currency, @Uint8ListConverter()  Uint8List? profilePicture,  String? userName,  String? email,  bool? isFirstTime, @FlexSchemeConverter()  FlexScheme colorScheme)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SettingsViewModel() when $default != null:
-return $default(_that.theme,_that.currency,_that.profilePicture,_that.userName,_that.email,_that.isFirstTime);case _:
+return $default(_that.theme,_that.currency,_that.profilePicture,_that.userName,_that.email,_that.isFirstTime,_that.colorScheme);case _:
   return orElse();
 
 }
@@ -179,10 +180,10 @@ return $default(_that.theme,_that.currency,_that.profilePicture,_that.userName,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ThemeMode theme,  Currency currency, @Uint8ListConverter()  Uint8List? profilePicture,  String? userName,  String? email,  bool? isFirstTime)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( ThemeMode theme,  Currency currency, @Uint8ListConverter()  Uint8List? profilePicture,  String? userName,  String? email,  bool? isFirstTime, @FlexSchemeConverter()  FlexScheme colorScheme)  $default,) {final _that = this;
 switch (_that) {
 case _SettingsViewModel():
-return $default(_that.theme,_that.currency,_that.profilePicture,_that.userName,_that.email,_that.isFirstTime);case _:
+return $default(_that.theme,_that.currency,_that.profilePicture,_that.userName,_that.email,_that.isFirstTime,_that.colorScheme);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +200,10 @@ return $default(_that.theme,_that.currency,_that.profilePicture,_that.userName,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ThemeMode theme,  Currency currency, @Uint8ListConverter()  Uint8List? profilePicture,  String? userName,  String? email,  bool? isFirstTime)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( ThemeMode theme,  Currency currency, @Uint8ListConverter()  Uint8List? profilePicture,  String? userName,  String? email,  bool? isFirstTime, @FlexSchemeConverter()  FlexScheme colorScheme)?  $default,) {final _that = this;
 switch (_that) {
 case _SettingsViewModel() when $default != null:
-return $default(_that.theme,_that.currency,_that.profilePicture,_that.userName,_that.email,_that.isFirstTime);case _:
+return $default(_that.theme,_that.currency,_that.profilePicture,_that.userName,_that.email,_that.isFirstTime,_that.colorScheme);case _:
   return null;
 
 }
@@ -214,7 +215,7 @@ return $default(_that.theme,_that.currency,_that.profilePicture,_that.userName,_
 @JsonSerializable()
 
 class _SettingsViewModel implements SettingsViewModel {
-  const _SettingsViewModel({required this.theme, required this.currency, @Uint8ListConverter() this.profilePicture, this.userName, this.email, this.isFirstTime});
+  const _SettingsViewModel({required this.theme, required this.currency, @Uint8ListConverter() this.profilePicture, this.userName, this.email, this.isFirstTime, @FlexSchemeConverter() this.colorScheme = FlexScheme.bahamaBlue});
   factory _SettingsViewModel.fromJson(Map<String, dynamic> json) => _$SettingsViewModelFromJson(json);
 
 @override final  ThemeMode theme;
@@ -223,6 +224,7 @@ class _SettingsViewModel implements SettingsViewModel {
 @override final  String? userName;
 @override final  String? email;
 @override final  bool? isFirstTime;
+@override@JsonKey()@FlexSchemeConverter() final  FlexScheme colorScheme;
 
 /// Create a copy of SettingsViewModel
 /// with the given fields replaced by the non-null parameter values.
@@ -237,16 +239,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SettingsViewModel&&(identical(other.theme, theme) || other.theme == theme)&&(identical(other.currency, currency) || other.currency == currency)&&const DeepCollectionEquality().equals(other.profilePicture, profilePicture)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.email, email) || other.email == email)&&(identical(other.isFirstTime, isFirstTime) || other.isFirstTime == isFirstTime));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SettingsViewModel&&(identical(other.theme, theme) || other.theme == theme)&&(identical(other.currency, currency) || other.currency == currency)&&const DeepCollectionEquality().equals(other.profilePicture, profilePicture)&&(identical(other.userName, userName) || other.userName == userName)&&(identical(other.email, email) || other.email == email)&&(identical(other.isFirstTime, isFirstTime) || other.isFirstTime == isFirstTime)&&(identical(other.colorScheme, colorScheme) || other.colorScheme == colorScheme));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,theme,currency,const DeepCollectionEquality().hash(profilePicture),userName,email,isFirstTime);
+int get hashCode => Object.hash(runtimeType,theme,currency,const DeepCollectionEquality().hash(profilePicture),userName,email,isFirstTime,colorScheme);
 
 @override
 String toString() {
-  return 'SettingsViewModel(theme: $theme, currency: $currency, profilePicture: $profilePicture, userName: $userName, email: $email, isFirstTime: $isFirstTime)';
+  return 'SettingsViewModel(theme: $theme, currency: $currency, profilePicture: $profilePicture, userName: $userName, email: $email, isFirstTime: $isFirstTime, colorScheme: $colorScheme)';
 }
 
 
@@ -257,7 +259,7 @@ abstract mixin class _$SettingsViewModelCopyWith<$Res> implements $SettingsViewM
   factory _$SettingsViewModelCopyWith(_SettingsViewModel value, $Res Function(_SettingsViewModel) _then) = __$SettingsViewModelCopyWithImpl;
 @override @useResult
 $Res call({
- ThemeMode theme, Currency currency,@Uint8ListConverter() Uint8List? profilePicture, String? userName, String? email, bool? isFirstTime
+ ThemeMode theme, Currency currency,@Uint8ListConverter() Uint8List? profilePicture, String? userName, String? email, bool? isFirstTime,@FlexSchemeConverter() FlexScheme colorScheme
 });
 
 
@@ -274,7 +276,7 @@ class __$SettingsViewModelCopyWithImpl<$Res>
 
 /// Create a copy of SettingsViewModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? theme = null,Object? currency = null,Object? profilePicture = freezed,Object? userName = freezed,Object? email = freezed,Object? isFirstTime = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? theme = null,Object? currency = null,Object? profilePicture = freezed,Object? userName = freezed,Object? email = freezed,Object? isFirstTime = freezed,Object? colorScheme = null,}) {
   return _then(_SettingsViewModel(
 theme: null == theme ? _self.theme : theme // ignore: cast_nullable_to_non_nullable
 as ThemeMode,currency: null == currency ? _self.currency : currency // ignore: cast_nullable_to_non_nullable
@@ -282,7 +284,8 @@ as Currency,profilePicture: freezed == profilePicture ? _self.profilePicture : p
 as Uint8List?,userName: freezed == userName ? _self.userName : userName // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String?,isFirstTime: freezed == isFirstTime ? _self.isFirstTime : isFirstTime // ignore: cast_nullable_to_non_nullable
-as bool?,
+as bool?,colorScheme: null == colorScheme ? _self.colorScheme : colorScheme // ignore: cast_nullable_to_non_nullable
+as FlexScheme,
   ));
 }
 

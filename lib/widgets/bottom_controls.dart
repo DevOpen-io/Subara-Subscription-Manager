@@ -7,17 +7,18 @@ class BottomControls extends StatelessWidget {
     required this.currentPage,
     required this.pageController,
     required this.finishOnboarding,
+    required this.totalPages,
   });
 
   final ValueNotifier<int> currentPage;
   final PageController pageController;
   final VoidCallback finishOnboarding;
-
-
-
+  final int totalPages;
 
   @override
   Widget build(BuildContext context) {
+    if (currentPage.value == 0) return const SizedBox.shrink();
+
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Row(
@@ -34,24 +35,8 @@ class BottomControls extends StatelessWidget {
               child: Text('common.back'.tr()),
             )
           else
-            const SizedBox(width: 64), // Placeholder for alignment
-          Row(
-            children: List.generate(
-              3,
-              (index) => Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: currentPage.value == index
-                      ? Theme.of(context).primaryColor
-                      : Colors.grey.shade300,
-                ),
-              ),
-            ),
-          ),
-          if (currentPage.value < 2)
+            const SizedBox(width: 64),
+          if (currentPage.value < totalPages - 1)
             TextButton(
               onPressed: () {
                 pageController.nextPage(

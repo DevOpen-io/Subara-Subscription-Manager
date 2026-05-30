@@ -16,6 +16,9 @@ _SettingsViewModel _$SettingsViewModelFromJson(Map<String, dynamic> json) =>
       userName: json['userName'] as String?,
       email: json['email'] as String?,
       isFirstTime: json['isFirstTime'] as bool?,
+      colorScheme: json['colorScheme'] == null
+          ? FlexScheme.bahamaBlue
+          : const FlexSchemeConverter().fromJson(json['colorScheme'] as String),
     );
 
 Map<String, dynamic> _$SettingsViewModelToJson(
@@ -27,6 +30,7 @@ Map<String, dynamic> _$SettingsViewModelToJson(
   'userName': instance.userName,
   'email': instance.email,
   'isFirstTime': instance.isFirstTime,
+  'colorScheme': const FlexSchemeConverter().toJson(instance.colorScheme),
 };
 
 const _$ThemeModeEnumMap = {

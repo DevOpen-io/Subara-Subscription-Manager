@@ -1,7 +1,40 @@
 version: 2
 enable-beta-ecosystems: true
 updates:
+  # Flutter/Dart dependencies from pubspec.yaml
   - package-ecosystem: "pub"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps"
+    groups:
+      riverpod-dependencies:
+        patterns:
+          # Riverpod Core and Tools
+          - "*riverpod*" 
+          # Freezed and Json Serialization (for data models)
+          - "freezed*" 
+          - "*json_annotation*"
+          - "*build_runner*" # build_runner is the core tool that runs the others
+          - "json_serializable"
+
+  # Android Gradle plugins & wrapper (AGP, Kotlin, Firebase, etc.)
+  - package-ecosystem: "gradle"
+    directory: "/android"
+    schedule:
+      interval: "weekly"
+    groups:
+      android-gradle-plugins:
+        patterns:
+          - "com.android.application"
+          - "org.jetbrains.kotlin.android"
+      firebase-gradle-plugins:
+        patterns:
+          - "com.google.gms.google-services"
+          - "com.google.firebase.crashlytics"
+
+  # GitHub Actions versions
+  - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"

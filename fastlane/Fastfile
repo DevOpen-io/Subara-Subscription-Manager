@@ -1,0 +1,16 @@
+default_platform(:android)
+
+platform :android do
+  desc "Deploy AAB to Google Play production"
+  lane :deploy_production do
+    upload_to_play_store(
+      track: "production",
+      aab: "../build/app/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false,
+      skip_upload_changelogs: false,
+      release_status: "completed"
+    )
+  end
+end

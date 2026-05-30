@@ -1,0 +1,13 @@
+SubZilla is a powerful and intuitive Flutter application designed to help you manage your monthly subscriptions, track recurring expenses, and stay in control of your budget.
+
+With recent major updates, SubZilla now offers an even smoother experience with enhanced performance, new features, and a polished design.
+
+Features:
+
+• Subscription Tracking: Keep all your subscriptions in one place.
+• Visual Analytics: Interactive charts to visualize your spending trends.
+• Calendar View: Manage payments with a monthly calendar view.
+• Smart Notifications: Get notified before a payment is due, so you never miss a beat.
+• Local Database: Your data is yours. Securely stored on your device.
+• Multi-Language Support: Available in English and Turkish.
+• Customizable Experience: Dark mode, custom themes, and currency settings.

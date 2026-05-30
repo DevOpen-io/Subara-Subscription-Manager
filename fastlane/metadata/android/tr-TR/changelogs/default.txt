@@ -1,0 +1,8 @@
+SubZilla'daki yenilikler:
+
+• Tüm aboneliklerinizi tek bir yerde takip edin ve yönetin
+• Etkileşimli harcama grafikleri ile görsel analizler
+• Yaklaşan ödemeler için takvim görünümü
+• Ödeme günü öncesi akıllı bildirimler
+• Karanlık mod, özel temalar ve para birimi ayarları
+• İngilizce ve Türkçe dil desteği

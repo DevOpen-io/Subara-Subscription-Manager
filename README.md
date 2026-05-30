@@ -109,6 +109,16 @@ We love contributions! If you have ideas for new features or have found a bug, h
 -   **Submit Pull Requests**: Fork the repository, make your changes, and submit a PR. Please ensure your code follows the project's style and passes all tests.
 -   **Support**: Give the project a star ⭐ to show your support!
 
+## 🔒 Privacy Policy
+
+-   Privacy Policy: [docs/privacy-policy.md](docs/privacy-policy.md)
+-   Public URL (for store listing/in-app): https://github.com/DevOpen-io/Subs-Tracker-App/blob/main/docs/privacy-policy.md
+
+## 📄 Terms & Conditions
+
+-   Terms & Conditions: [docs/terms-and-conditions.md](docs/terms-and-conditions.md)
+-   Public URL (for store listing/in-app): https://github.com/DevOpen-io/Subs-Tracker-App/blob/main/docs/terms-and-conditions.md
+
 ---
 
 <a id="turkish"></a>
@@ -215,6 +225,16 @@ Katkıları seviyoruz! Yeni özellikler için fikirleriniz varsa veya bir hata b
 -   **Sorun Bildirin**: Hataları bildirmek veya özellik istemek için [GitHub Issues](https://github.com/DevOpen-io/SubZilla/issues) sekmesini kullanın.
 -   **Pull Request Gönderin**: Depoyu fork'layın, değişikliklerinizi yapın ve bir PR gönderin. Lütfen kodunuzun proje stiline uyduğundan ve tüm testleri geçtiğinden emin olun.
 -   **Destek**: Desteğinizi göstermek için projeye bir yıldız ⭐ verin!
+
+## 🔒 Gizlilik Politikası
+
+-   Gizlilik Politikası: [docs/privacy-policy.md](docs/privacy-policy.md)
+-   Herkese açık URL (mağaza listeleme/uygulama içi): https://github.com/DevOpen-io/Subs-Tracker-App/blob/main/docs/privacy-policy.md
+
+## 📄 Kullanım Koşulları
+
+-   Kullanım Koşulları: [docs/terms-and-conditions.md](docs/terms-and-conditions.md)
+-   Herkese açık URL (mağaza listeleme/uygulama içi): https://github.com/DevOpen-io/Subs-Tracker-App/blob/main/docs/terms-and-conditions.md
 
 ---
 

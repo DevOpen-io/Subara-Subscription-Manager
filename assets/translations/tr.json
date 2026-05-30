@@ -7,6 +7,8 @@
 		"dark": "Koyu",
 		"system": "Sistem",
 		"select_theme": "Tema Seç",
+		"color_scheme": "Renk Teması",
+		"select_color_scheme": "Renk Teması Seç",
 		"currency": "Para Birimi",
 		"currency_unit": "Para Birimi",
 		"select_currency": "Para Birimi Seç",
@@ -26,7 +28,12 @@
 		"delete_confirm": "{} silinsin mi?",
 		"cancel": "İptal",
 		"delete": "Sil",
-		"renews_info": "Yenilenme {} • {}"
+		"renews_info": "Yenilenme {} • {}",
+		"renews_today_alert_title": "Bugün yenileniyor",
+		"renews_today_alert_subtitle": "{} abonelik bugün yenileniyor",
+		"renews_today_badge": "Bugün",
+		"sort_soonest": "En yakın",
+		"sort_default": "Varsayılan"
 	},
 	"frequency": {
 		"daily": "Günlük",
@@ -41,8 +48,6 @@
 		}
 	},
 	"intro": {
-		"title": "SubZilla'ya\nHoş Geldiniz",
-		"subtitle": "Tüm aboneliklerinizi tek bir yerden takip edin.\nÖdemelerinizi bir daha asla kaçırmayın.",
 		"name_title": "Size nasıl\nhitap edelim?",
 		"name_label": "Adınız",
 		"name_hint": "Ali Yılmaz",
@@ -63,7 +68,21 @@
 		"connect_gravatar": "Gravatar'a Bağlan",
 		"username_saved": "Kullanıcı Adı Kaydedildi!",
 		"email_saved": "E-posta Kaydedildi!",
-		"username_label": "Kullanıcı Adı"
+		"username_label": "Kullanıcı Adı",
+		"eyebrow": "SUBZİLLA'YA HOŞGELDİNİZ",
+		"headline": "Tüm tekrarlayan ödemelerin",
+		"headline_accent": "kontrolünü ele al.",
+		"subtitle": "Aboneliklerinizi takip edin, yenilemeleri görün ve bütçenizi yönetin — tüm veriler cihazınızda özel olarak saklanır.",
+		"get_started": "Başla",
+		"already_user": "Zaten kullanıcı mısınız?",
+		"restore_backup": "Yedeği geri yükle",
+		"color_scheme_eyebrow": "GÖRÜNÜM",
+		"color_scheme_title": "Renginizi seçin",
+		"color_scheme_subtitle": "Bunu ayarlardan istediğiniz zaman değiştirebilirsiniz.",
+		"popular_eyebrow": "POPÜLER ABONELİKLER",
+		"popular_title": "Favorilerini ekle",
+		"popular_subtitle": "Eklemek için + 'ya dokun. İstediğin zaman geçebilirsin.",
+		"popular_cta": "Başla"
 	},
 	"common": {
 		"back": "Geri",
@@ -74,6 +93,7 @@
 	},
 	"dialogs": {
 		"add_title": "Abonelik Ekle",
+		"new_sub_title": "Yeni Abonelik",
 		"edit_title": "Aboneliği Düzenle",
 		"custom_color": "Özel renk",
 		"cancel": "İptal",
@@ -81,8 +101,11 @@
 		"brand_label": "Marka veya özel isim",
 		"required": "Zorunlu",
 		"amount_label": "Tutar",
+		"price_label": "Fiyat",
 		"invalid_number": "Geçerli bir sayı girin",
 		"start_date": "Başlangıç tarihi",
+		"first_charge": "İlk ödeme",
+		"cycle_label": "Döngü",
 		"frequency_label": "Sıklık",
 		"slice_color": "Dilim rengi",
 		"custom_color_selected": "Özel renk seçildi",
@@ -91,7 +114,11 @@
 		"save_btn": "Kaydet",
 		"close_btn": "Kapat",
 		"error_loading": "Markalar yüklenirken hata: {}",
-		"selected_tooltip": "Seçilen: {}"
+		"selected_tooltip": "Seçilen: {}",
+		"name_label": "İsim",
+		"search_placeholder": "{}+ hizmet ara",
+		"popular": "POPÜLER",
+		"or_enter_manually": "VEYA MANUEL GİRİN"
 	},
 	"menu": {
 		"main_menu": "Ana Menü",
@@ -104,6 +131,8 @@
 		"export": "Abonelikleri Dışa Aktar",
 		"import": "Abonelikleri İçe Aktar",
 		"about": "Hakkında",
+		"privacy_policy": "Gizlilik Politikası",
+		"terms_conditions": "Kullanım Koşulları",
 		"about_desc": "Aboneliklerinizi kolayca takip etmenizi sağlayan açık kaynaklı bir uygulama.",
 		"view_github": "GitHub'da Görüntüle",
 		"export_success": "Abonelikler başarıyla dışa aktarıldı!",
@@ -120,17 +149,44 @@
 		"no_data": "Henüz analiz edilecek abonelik verisi yok.",
 		"title": "Abonelik Analizi",
 		"summary": "Özet",
-		"total_monthly": "Toplam Aylık Harcama",
-		"active_subs": "Aktif Abonelikler",
-		"avg_cost": "Ortalama Aylık Maliyet",
+		"total_monthly": "Aylık Toplam",
+		"total_quarterly": "3 Aylık Toplam",
+		"total_yearly": "Yıllık Toplam",
+		"active_subs": "Aktif Abonelik",
+		"avg_cost": "Ort. Maliyet",
 		"breakdown": "Abonelik Dağılımı",
 		"per_month": "/ay",
-		"percent_total": "toplamın %"
+		"percent_total": "toplamın %",
+		"period_month": "Ay",
+		"period_quarter": "3 Ay",
+		"period_year": "Yıl"
 	},
 	"frequency_names": {
 		"daily": "GÜNLÜK",
 		"weekly": "HAFTALIK",
 		"monthly": "AYLIK",
 		"yearly": "YILLIK"
+	},
+	"detail": {
+		"back": "Abonelikler",
+		"active": "Aktif",
+		"cost": "TUTAR",
+		"per_frequency": "{} başına",
+		"next_charge": "SONRAKI ÖDEME",
+		"in_days": "{} gün sonra",
+		"today": "bugün",
+		"section_details": "DETAYLAR",
+		"section_history": "ÖDEME GEÇMİŞİ",
+		"see_all": "Tümünü gör",
+		"billing_cycle": "Fatura döngüsü",
+		"started": "Başlangıç",
+		"payment_method": "Ödeme yöntemi",
+		"category": "Kategori",
+		"reminder": "Hatırlatıcı",
+		"not_set": "—",
+		"delete": "Aboneliği Sil",
+		"delete_confirm": "{} aboneliğini silmek istediğinizden emin misiniz?",
+		"delete_action": "Sil",
+		"cancel": "İptal"
 	}
 }
