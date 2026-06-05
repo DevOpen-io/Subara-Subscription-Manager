@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:subs_tracker/models/sub_slice.dart';
 import 'package:subs_tracker/providers/subs_controller.dart';
 import 'package:subs_tracker/widgets/brand_logo.dart';
+import 'package:subs_tracker/widgets/sub_zilla_app_bar.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarScreen extends HookConsumerWidget {
@@ -47,6 +48,7 @@ class CalendarScreen extends HookConsumerWidget {
     }
 
     return Scaffold(
+      appBar: SubZillaAppBar(),
       body: subsAsync.when(
         data: (subs) {
           final List<SubSlice> selectedEvents = selectedDay.value == null

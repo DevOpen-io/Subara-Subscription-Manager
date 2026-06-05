@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -53,10 +51,6 @@ class SettingsController extends _$SettingsController {
 
   void updateCurrency(Currency currency) {
     state = AsyncData(state.value!.copyWith(currency: currency));
-  }
-
-  void updateProfilePicture(Uint8List? profilePicture) {
-    state = AsyncData(state.value!.copyWith(profilePicture: profilePicture));
   }
 
   void updateUserName(String? userName) {

@@ -7,6 +7,7 @@ import 'package:subs_tracker/models/settings_view_model.dart';
 import 'package:subs_tracker/providers/settings_controller.dart';
 import 'package:subs_tracker/utils/app_theme.dart';
 import 'package:subs_tracker/widgets/color_scheme_picker.dart';
+import 'package:subs_tracker/widgets/sub_zilla_app_bar.dart';
 
 class SettingsScreen extends HookConsumerWidget {
   const SettingsScreen({super.key});
@@ -16,6 +17,7 @@ class SettingsScreen extends HookConsumerWidget {
     final settingsAsync = ref.watch(settingsControllerProvider);
 
     return Scaffold(
+      appBar: SubZillaAppBar(),
       body: settingsAsync.when(
         data: (settings) => _buildSettings(context, settings, ref),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -35,9 +37,9 @@ class SettingsScreen extends HookConsumerWidget {
         children: [
           Text(
             "settings.title",
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
           ).tr(),
           const SizedBox(height: 24),
           // Theme Section
@@ -52,7 +54,8 @@ class SettingsScreen extends HookConsumerWidget {
               _SettingsTile(
                 title: "settings.color_scheme".tr(),
                 subtitle: schemeDisplayName(settings.colorScheme),
-                onTap: () => _showColorSchemeBottomSheet(context, settings, ref),
+                onTap: () =>
+                    _showColorSchemeBottomSheet(context, settings, ref),
               ),
             ],
           ),
@@ -65,8 +68,7 @@ class SettingsScreen extends HookConsumerWidget {
                 title: "settings.currency_unit".tr(),
                 subtitle:
                     "${settings.currency.label} (${settings.currency.symbol})",
-                onTap: () =>
-                    _showCurrencyBottomSheet(context, settings, ref),
+                onTap: () => _showCurrencyBottomSheet(context, settings, ref),
               ),
             ],
           ),
@@ -102,13 +104,11 @@ class SettingsScreen extends HookConsumerWidget {
             ],
           ),
           const SizedBox(height: 24),
-        if (kDebugMode)
-          _SettingsSection(
-            title: "Developer",
-            children: [
-              _ResetOnboardingTile(ref: ref),
-            ],
-          ),
+          if (kDebugMode)
+            _SettingsSection(
+              title: "Developer",
+              children: [_ResetOnboardingTile(ref: ref)],
+            ),
         ],
       ),
     );
@@ -131,6 +131,7 @@ class SettingsScreen extends HookConsumerWidget {
     WidgetRef ref,
   ) {
     showModalBottomSheet(
+      useRootNavigator: true,
       context: context,
       builder: (context) {
         return SafeArea(
@@ -142,21 +143,22 @@ class SettingsScreen extends HookConsumerWidget {
                 child: Text(
                   "settings.select_theme".tr(),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              ...[ThemeMode.light, ThemeMode.dark, ThemeMode.system]
-                  .map((mode) => _ThemeOption(
-                        label: _getThemeLabel(mode).tr(),
-                        isSelected: settings.theme == mode,
-                        onTap: () {
-                          ref
-                              .read(settingsControllerProvider.notifier)
-                              .updateTheme(mode);
-                          Navigator.pop(context);
-                        },
-                      )),
+              ...[ThemeMode.light, ThemeMode.dark, ThemeMode.system].map(
+                (mode) => _ThemeOption(
+                  label: _getThemeLabel(mode).tr(),
+                  isSelected: settings.theme == mode,
+                  onTap: () {
+                    ref
+                        .read(settingsControllerProvider.notifier)
+                        .updateTheme(mode);
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
               const SizedBox(height: 16),
             ],
           ),
@@ -171,6 +173,7 @@ class SettingsScreen extends HookConsumerWidget {
     WidgetRef ref,
   ) {
     showModalBottomSheet(
+      useRootNavigator: true,
       context: context,
       builder: (context) {
         return SafeArea(
@@ -182,8 +185,8 @@ class SettingsScreen extends HookConsumerWidget {
                 child: Text(
                   "settings.select_color_scheme".tr(),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               ColorSchemePicker(
@@ -209,6 +212,7 @@ class SettingsScreen extends HookConsumerWidget {
     WidgetRef ref,
   ) {
     showModalBottomSheet(
+      useRootNavigator: true,
       context: context,
       builder: (context) {
         return SafeArea(
@@ -220,25 +224,27 @@ class SettingsScreen extends HookConsumerWidget {
                 child: Text(
                   "settings.select_currency".tr(),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               Flexible(
                 child: ListView(
                   shrinkWrap: true,
                   children: Currency.values
-                      .map((currency) => _CurrencyOption(
-                            label: currency.label,
-                            symbol: currency.symbol,
-                            isSelected: settings.currency == currency,
-                            onTap: () {
-                              ref
-                                  .read(settingsControllerProvider.notifier)
-                                  .updateCurrency(currency);
-                              Navigator.pop(context);
-                            },
-                          ))
+                      .map(
+                        (currency) => _CurrencyOption(
+                          label: currency.label,
+                          symbol: currency.symbol,
+                          isSelected: settings.currency == currency,
+                          onTap: () {
+                            ref
+                                .read(settingsControllerProvider.notifier)
+                                .updateCurrency(currency);
+                            Navigator.pop(context);
+                          },
+                        ),
+                      )
                       .toList(),
                 ),
               ),
@@ -249,10 +255,10 @@ class SettingsScreen extends HookConsumerWidget {
       },
     );
   }
-  Future<void> _showLanguageBottomSheet(
-    BuildContext context,
-  ) async {
+
+  Future<void> _showLanguageBottomSheet(BuildContext context) async {
     await showModalBottomSheet(
+      useRootNavigator: true,
       context: context,
       builder: (context) {
         return SafeArea(
@@ -264,8 +270,8 @@ class SettingsScreen extends HookConsumerWidget {
                 child: Text(
                   "settings.select_language".tr(),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               LanguageOption(
@@ -294,10 +300,7 @@ class SettingsScreen extends HookConsumerWidget {
 }
 
 class _SettingsSection extends StatelessWidget {
-  const _SettingsSection({
-    required this.title,
-    required this.children,
-  });
+  const _SettingsSection({required this.title, required this.children});
 
   final String title;
   final List<Widget> children;
@@ -310,9 +313,9 @@ class _SettingsSection extends StatelessWidget {
         Text(
           title,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
         ),
         const SizedBox(height: 12),
         ...children,
@@ -340,10 +343,7 @@ class _SettingsTile extends StatelessWidget {
         color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: Theme.of(context)
-              .colorScheme
-              .outline
-              .withValues(alpha: 0.2),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: ListTile(
@@ -378,8 +378,10 @@ class _ThemeOption extends StatelessWidget {
     return ListTile(
       title: Text(label),
       leading: isSelected
-          ? Icon(Icons.radio_button_checked,
-              color: Theme.of(context).primaryColor)
+          ? Icon(
+              Icons.radio_button_checked,
+              color: Theme.of(context).primaryColor,
+            )
           : const Icon(Icons.radio_button_unchecked),
       onTap: onTap,
     );
@@ -405,8 +407,10 @@ class _CurrencyOption extends StatelessWidget {
       title: Text(label),
       subtitle: Text(symbol),
       leading: isSelected
-          ? Icon(Icons.radio_button_checked,
-              color: Theme.of(context).primaryColor)
+          ? Icon(
+              Icons.radio_button_checked,
+              color: Theme.of(context).primaryColor,
+            )
           : const Icon(Icons.radio_button_unchecked),
       onTap: onTap,
     );
@@ -444,7 +448,9 @@ class _ResetOnboardingTile extends StatelessWidget {
             context: context,
             builder: (ctx) => AlertDialog(
               title: const Text('Reset onboarding?'),
-              content: const Text('This will show the intro screens on next app launch.'),
+              content: const Text(
+                'This will show the intro screens on next app launch.',
+              ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx, false),
@@ -459,7 +465,9 @@ class _ResetOnboardingTile extends StatelessWidget {
             ),
           );
           if (confirmed == true && context.mounted) {
-            ref.read(settingsControllerProvider.notifier).updateIsFirstTime(true);
+            ref
+                .read(settingsControllerProvider.notifier)
+                .updateIsFirstTime(true);
             context.go('/intro');
           }
         },
@@ -469,7 +477,8 @@ class _ResetOnboardingTile extends StatelessWidget {
 }
 
 class LanguageOption extends StatelessWidget {
-  const LanguageOption({super.key, 
+  const LanguageOption({
+    super.key,
     required this.label,
     required this.isSelected,
     required this.onTap,
@@ -484,8 +493,10 @@ class LanguageOption extends StatelessWidget {
     return ListTile(
       title: Text(label),
       leading: isSelected
-          ? Icon(Icons.radio_button_checked,
-              color: Theme.of(context).primaryColor)
+          ? Icon(
+              Icons.radio_button_checked,
+              color: Theme.of(context).primaryColor,
+            )
           : const Icon(Icons.radio_button_unchecked),
       onTap: onTap,
     );

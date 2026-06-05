@@ -1,5 +1,6 @@
 import 'dart:collection';
-import "package:unorm_dart/unorm_dart.dart" as unorm;
+
+import 'package:unorm_dart/unorm_dart.dart' as unorm;
 
 String validateVariableName(String name) {
   // adds 'Icon' behind variables consistent out of locked dart keywords

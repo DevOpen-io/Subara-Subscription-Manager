@@ -7,6 +7,7 @@ import 'package:subs_tracker/models/sub_slice.dart';
 import 'package:subs_tracker/providers/settings_controller.dart';
 import 'package:subs_tracker/providers/subs_controller.dart';
 import 'package:subs_tracker/widgets/pie_chart.dart';
+import 'package:subs_tracker/widgets/sub_zilla_app_bar.dart';
 
 enum _Period { month, quarter, year }
 
@@ -40,6 +41,7 @@ class AnalyticsScreen extends HookConsumerWidget {
     final period = useState(_Period.month);
 
     return Scaffold(
+      appBar: SubZillaAppBar(),
       body: slicesAsync.when(
         data: (slices) => settingsAsync.when(
           data: (settings) => _buildBody(slices, settings, context, period),

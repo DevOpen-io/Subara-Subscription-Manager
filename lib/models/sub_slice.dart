@@ -20,6 +20,7 @@ abstract class SubSlice with _$SubSlice {
     required int color,
     required DateTime startDate,
     @Default(Frequency.monthly) Frequency frequency,
+    String? category,
   }) = _SubSlice;
 
   const SubSlice._();

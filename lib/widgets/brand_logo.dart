@@ -2,6 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:subs_tracker/models/brand.dart';
 import 'package:subs_tracker/utils/brand_utils.dart';
 
+class SubLeadingIcon extends StatelessWidget {
+  const SubLeadingIcon({
+    super.key,
+    required this.name,
+    required this.color,
+    this.brand,
+    required this.size,
+  });
+
+  final String name;
+  final Color color;
+  final Brand? brand;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    if (brand != null) return BrandLogo(brand: brand, size: size);
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(size * 0.15),
+      ),
+      child: Center(
+        child: Text(
+          name[0].toUpperCase(),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: size * 0.5,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class BrandLogo extends StatelessWidget {
   const BrandLogo({
     super.key,

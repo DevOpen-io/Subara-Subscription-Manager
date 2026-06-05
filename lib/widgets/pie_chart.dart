@@ -51,7 +51,6 @@ class _SubsPieState extends ConsumerState<SubsPie> {
               ),
               sections: List.generate(slices.length, (i) {
                 final s = slices[i];
-                final label = s.brand?.text ?? s.name;
                 final isTouched = i == touchedIndex;
                 final percent = total == 0 ? 0 : (s.monthlyAmount / total) * 100;
                 return PieChartSectionData(
@@ -65,7 +64,7 @@ class _SubsPieState extends ConsumerState<SubsPie> {
                   ),
                   radius: isTouched ? 120 : 100,
                   badgeWidget: _Badge(
-                    label: label,
+                    name: s.name,
                     brand: s.brand,
                     borderColor: Color(s.color),
                   ),
@@ -83,15 +82,14 @@ class _SubsPieState extends ConsumerState<SubsPie> {
 }
 
 class _Badge extends StatelessWidget {
-  const _Badge({required this.label, required this.borderColor, this.brand});
-  final String label;
+  const _Badge({required this.name, required this.borderColor, this.brand});
+  final String name;
   final Color borderColor;
   final Brand? brand;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(minHeight: 25, minWidth: 30),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(10),
@@ -101,16 +99,8 @@ class _Badge extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: brand != null ? BrandLogo(
-          brand: brand,
-          size: 25,
-        ) :
-                    Text(
-                      label,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.labelMedium,
-                    ),
+        padding: const EdgeInsets.all(4),
+        child: SubLeadingIcon(name: name, brand: brand, color: borderColor, size: 24),
       ),
     );
   }
