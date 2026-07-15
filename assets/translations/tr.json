@@ -16,7 +16,10 @@
 		"select_language": "Dil Seç",
 		"about": "Hakkında",
 		"version": "Sürüm",
-		"app_name": "SubZilla"
+		"app_name": "SubZilla",
+		"notifications_title": "Bildirimler",
+		"notify_due_today": "Bugün vadesi dolan hatırlatıcılar",
+		"notify_due_tomorrow": "Yarın vadesi dolan hatırlatıcılar"
 	},
 	"home": {
 		"no_subs": "Henüz Abonelik Eklenmedi.",
@@ -33,7 +36,18 @@
 		"renews_today_alert_subtitle": "{} abonelik bugün yenileniyor",
 		"renews_today_badge": "Bugün",
 		"sort_soonest": "En yakın",
-		"sort_default": "Varsayılan"
+		"sort_default": "Varsayılan",
+		"renewing_soon": "Yakında yenileniyor",
+		"tomorrow": "Yarın",
+		"sort": "Sırala",
+		"sort_title": "Abonelikleri Sırala",
+		"sort_name_asc": "İsim A → Z",
+		"sort_name_desc": "İsim Z → A",
+		"sort_amount_asc": "Tutar (düşükten yükseğe)",
+		"sort_amount_desc": "Tutar (yüksekten düşüğe)",
+		"total_spending_yearly": "Toplam Yıllık Harcama",
+		"view_monthly": "Aylık",
+		"view_yearly": "Yıllık"
 	},
 	"frequency": {
 		"daily": "Günlük",
@@ -89,7 +103,8 @@
 		"next": "İleri",
 		"finish": "Bitir",
 		"error_generic": "Bir şeyler ters gitti",
-		"second_page": "İkinci Sayfa"
+		"second_page": "İkinci Sayfa",
+		"save": "Kaydet"
 	},
 	"dialogs": {
 		"add_title": "Abonelik Ekle",
@@ -118,7 +133,10 @@
 		"name_label": "İsim",
 		"search_placeholder": "{}+ hizmet ara",
 		"popular": "POPÜLER",
-		"or_enter_manually": "VEYA MANUEL GİRİN"
+		"or_enter_manually": "VEYA MANUEL GİRİN",
+		"note_label": "Not",
+		"status_label": "Durum",
+		"trial_ends_label": "Deneme bitiş"
 	},
 	"menu": {
 		"main_menu": "Ana Menü",
@@ -165,7 +183,10 @@
 		"percent_total": "toplamın %",
 		"period_month": "Ay",
 		"period_quarter": "3 Ay",
-		"period_year": "Yıl"
+		"period_year": "Yıl",
+		"chart_title": "Harcama Özeti",
+		"chart_mode_amount": "Tutar",
+		"chart_mode_share": "Pay"
 	},
 	"frequency_names": {
 		"daily": "GÜNLÜK",
@@ -191,10 +212,23 @@
 		"color": "Renk",
 		"custom_color": "Özel",
 		"reminder": "Hatırlatıcı",
+		"reminder_none": "Kapalı",
+		"reminder_onDay": "Gün içinde",
+		"reminder_dayBefore": "Bir gün önce",
+		"reminder_both": "Tümü",
 		"not_set": "—",
 		"delete": "Aboneliği Sil",
 		"delete_confirm": "{} aboneliğini silmek istediğinizden emin misiniz?",
 		"delete_action": "Sil",
-		"cancel": "İptal"
+		"cancel": "İptal",
+		"card_hint": "Son 4 hane",
+		"note": "Not",
+		"note_hint": "Bir not ekleyin",
+		"status": "Durum",
+		"status_active": "Aktif",
+		"status_freeTrial": "Ücretsiz Deneme",
+		"status_paused": "Duraklatıldı",
+		"status_cancelled": "İptal Edildi",
+		"trial_ends": "Deneme bitişi"
 	}
 }

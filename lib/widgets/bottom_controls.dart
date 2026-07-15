@@ -20,7 +20,7 @@ class BottomControls extends StatelessWidget {
     if (currentPage.value == 0) return const SizedBox.shrink();
 
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.all(24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

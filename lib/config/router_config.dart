@@ -1,17 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:subs_tracker/layout/root_layout.dart';
-import 'package:subs_tracker/models/sub_slice.dart';
-import 'package:subs_tracker/providers/settings_controller.dart';
-import 'package:subs_tracker/screens/analytics_screen.dart';
-import 'package:subs_tracker/screens/app_startup.dart';
-import 'package:subs_tracker/screens/calendar_screen.dart';
-import 'package:subs_tracker/screens/home_screen.dart';
-import 'package:subs_tracker/screens/onboarding_screen.dart';
-import 'package:subs_tracker/screens/settings_screen.dart';
-import 'package:subs_tracker/screens/sub_detail_screen.dart';
+import '../layout/root_layout.dart';
+import '../models/sub_slice.dart';
+import '../providers/settings_controller.dart';
+import '../screens/analytics_screen.dart';
+import '../screens/app_startup.dart';
+import '../screens/calendar_screen.dart';
+import '../screens/home_screen.dart';
+import '../screens/onboarding_screen.dart';
+import '../screens/settings_screen.dart';
+import '../screens/sub_detail_screen.dart';
 
 part 'router_config.g.dart';
 
@@ -44,7 +42,7 @@ GoRouter goRouter(Ref ref) {
         routes: [
           GoRoute(
             path: Routes.home.route,
-            builder: (BuildContext context, GoRouterState state) {
+            builder: (context, state) {
               return const AppStartup(child: HomeScreen());
             },
             redirect: (context, state) async {
@@ -59,25 +57,25 @@ GoRouter goRouter(Ref ref) {
           ),
           GoRoute(
             path: Routes.intro.route,
-            builder: (BuildContext context, GoRouterState state) {
+            builder: (context, state) {
               return const OnboardingScreen();
             },
           ),
           GoRoute(
             path: Routes.calendar.route,
-            builder: (BuildContext context, GoRouterState state) {
+            builder: (context, state) {
               return const CalendarScreen();
             },
           ),
           GoRoute(
             path: Routes.analytics.route,
-            builder: (BuildContext context, GoRouterState state) {
+            builder: (context, state) {
               return const AnalyticsScreen();
             },
           ),
           GoRoute(
             path: Routes.settings.route,
-            builder: (BuildContext context, GoRouterState state) =>
+            builder: (context, state) =>
                 const SettingsScreen(),
           ),
         ],

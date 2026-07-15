@@ -7,11 +7,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:subs_tracker/config/router_config.dart';
-import 'package:subs_tracker/providers/settings_controller.dart';
-import 'package:subs_tracker/providers/subs_controller.dart';
-import 'package:subs_tracker/widgets/add_subs_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../config/router_config.dart';
+import '../providers/settings_controller.dart';
+import '../providers/subs_controller.dart';
+import 'add_subs_dialog.dart';
 
 class SidebarMenu extends ConsumerStatefulWidget {
   const SidebarMenu({super.key});
@@ -142,8 +143,8 @@ class _MenubarState extends ConsumerState<SidebarMenu> {
         future: _pkg,
         builder: (ctx, snap) {
           final version = snap.hasData
-              ? "${snap.data!.version} (${snap.data!.buildNumber})"
-              : "—";
+              ? '${snap.data!.version} (${snap.data!.buildNumber})'
+              : '—';
           return AlertDialog.adaptive(
             title: Text('settings.app_name'.tr()),
             content: Column(
@@ -152,7 +153,7 @@ class _MenubarState extends ConsumerState<SidebarMenu> {
               children: [
                 Row(
                   children: [
-                    Image.asset("assets/App_Logo.png", width: 48, height: 48),
+                    Image.asset('assets/App_Logo.png', width: 48, height: 48),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -169,12 +170,12 @@ class _MenubarState extends ConsumerState<SidebarMenu> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                Text("menu.about_desc".tr()),
+                Text('menu.about_desc'.tr()),
                 const SizedBox(height: 12),
                 InkWell(
                   onTap: _launchUrl,
                   child: Text(
-                    "menu.view_github".tr(),
+                    'menu.view_github'.tr(),
                     style: const TextStyle(
                       color: Colors.blue,
                       decoration: TextDecoration.underline,
@@ -215,7 +216,7 @@ class _MenubarState extends ConsumerState<SidebarMenu> {
                   children: [
                     CircleAvatar(
                       radius: 24,
-                      child: ClipOval(child: Image.asset("assets/App_Logo.png", width: 48, height: 48)),
+                      child: ClipOval(child: Image.asset('assets/App_Logo.png', width: 48, height: 48)),
                     ),
                     const SizedBox(width: 12),
                     Text(
@@ -230,7 +231,7 @@ class _MenubarState extends ConsumerState<SidebarMenu> {
               ),
               ListTile(
                 leading: const Icon(Icons.home_outlined),
-                title: Text("menu.home".tr()),
+                title: Text('menu.home'.tr()),
                 onTap: () {
                   Navigator.of(context).pop();
                   context.go(Routes.home.route);
@@ -259,7 +260,7 @@ class _MenubarState extends ConsumerState<SidebarMenu> {
               const Divider(height: 24, indent: 16, endIndent: 16),
               SwitchListTile(
                 secondary: const Icon(Icons.dark_mode_outlined),
-                title: Text("menu.dark_mode".tr()),
+                title: Text('menu.dark_mode'.tr()),
                 value: slice.theme == ThemeMode.dark,
                 onChanged: (value) {
                   ref
@@ -269,7 +270,7 @@ class _MenubarState extends ConsumerState<SidebarMenu> {
               ),
               ListTile(
                 leading: const Icon(Icons.upload_file_outlined),
-                title: Text("menu.export".tr()),
+                title: Text('menu.export'.tr()),
                 onTap: () {
                   Navigator.of(context).pop();
                   _exportSubscriptions();
@@ -277,7 +278,7 @@ class _MenubarState extends ConsumerState<SidebarMenu> {
               ),
               ListTile(
                 leading: const Icon(Icons.download_outlined),
-                title: Text("menu.import".tr()),
+                title: Text('menu.import'.tr()),
                 onTap: () async {
                   final confirmed = await showAdaptiveDialog<bool>(
                     context: context,
@@ -305,7 +306,7 @@ class _MenubarState extends ConsumerState<SidebarMenu> {
               const Divider(height: 24, indent: 16, endIndent: 16),
               ListTile(
                 leading: const Icon(Icons.privacy_tip_outlined),
-                title: Text("menu.privacy_policy".tr()),
+                title: Text('menu.privacy_policy'.tr()),
                 onTap: () {
                   Navigator.of(context).pop();
                   _launchPrivacyPolicy();
@@ -313,7 +314,7 @@ class _MenubarState extends ConsumerState<SidebarMenu> {
               ),
               ListTile(
                 leading: const Icon(Icons.gavel_outlined),
-                title: Text("menu.terms_conditions".tr()),
+                title: Text('menu.terms_conditions'.tr()),
                 onTap: () {
                   Navigator.of(context).pop();
                   _launchTermsAndConditions();
@@ -321,7 +322,7 @@ class _MenubarState extends ConsumerState<SidebarMenu> {
               ),
               ListTile(
                 leading: const Icon(Icons.info_outline),
-                title: Text("menu.about".tr()),
+                title: Text('menu.about'.tr()),
                 onTap: () {
                   Navigator.of(context).pop();
                   _showAboutDialog(context);

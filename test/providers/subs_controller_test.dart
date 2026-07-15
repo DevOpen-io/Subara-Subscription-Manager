@@ -19,12 +19,12 @@ void main() {
 
   setUp(() {
     // Mock Notification Channel to prevent crash
-    const MethodChannel notificationChannel =
+    const notificationChannel =
         MethodChannel('dexterous.com/flutter/local_notifications');
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
       notificationChannel,
-      (MethodCall methodCall) async {
+      (methodCall) async {
         return null;
       },
     );
@@ -33,7 +33,7 @@ void main() {
   test('SubsController adds a slice and updates state', () async {
     final container = ProviderContainer(
       overrides: [
-        subsControllerProvider.overrideWith(() => TestSubsController()),
+        subsControllerProvider.overrideWith(TestSubsController.new),
       ],
     );
 
@@ -44,10 +44,9 @@ void main() {
     // Add a slice
     final slice = SubSlice(
       name: 'Netflix',
-      amount: 15.0,
+      amount: 15,
       color: 0xFF000000,
       startDate: DateTime.now(),
-      frequency: Frequency.monthly,
     );
 
     container.read(subsControllerProvider.notifier).addSlice(slice);
@@ -62,13 +61,13 @@ void main() {
   test('SubsController removes a slice', () async {
     final container = ProviderContainer(
       overrides: [
-        subsControllerProvider.overrideWith(() => TestSubsController()),
+        subsControllerProvider.overrideWith(TestSubsController.new),
       ],
     );
 
     final slice = SubSlice(
       name: 'Spotify',
-      amount: 10.0,
+      amount: 10,
       color: 0xFF000000,
       startDate: DateTime.now(),
     );

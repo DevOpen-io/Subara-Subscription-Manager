@@ -3,8 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:subs_tracker/providers/settings_controller.dart';
-import 'package:subs_tracker/utils/app_theme.dart';
+
+import '../utils/app_theme.dart';
+import 'settings_controller.dart';
 
 part 'theme_provider.g.dart';
 

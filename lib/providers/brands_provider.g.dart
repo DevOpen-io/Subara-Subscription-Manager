@@ -28,7 +28,7 @@ final class BrandsStorageProvider
         argument: null,
         retry: null,
         name: r'brandsStorageProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -48,7 +48,7 @@ final class BrandsStorageProvider
   }
 }
 
-String _$brandsStorageHash() => r'50746d0570d0e548601bf78a377e429911d66e17';
+String _$brandsStorageHash() => r'e6c82756df3f3111599fba738a880ba51c90b461';
 
 @ProviderFor(Brands)
 @JsonPersist()
@@ -75,7 +75,7 @@ final class BrandsProvider extends $AsyncNotifierProvider<Brands, List<Brand>> {
   Brands create() => Brands();
 }
 
-String _$brandsHash() => r'97f03c4666ac0e5b65ce616e7e19160591ef1157';
+String _$brandsHash() => r'7e2ef10206303a9c80e491878ab37959549b938e';
 
 @JsonPersist()
 abstract class _$BrandsBase extends $AsyncNotifier<List<Brand>> {

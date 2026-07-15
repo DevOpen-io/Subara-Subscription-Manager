@@ -12,7 +12,7 @@ class ActionTextFormField extends StatefulWidget {
   final String labelText;
   final String initialValue;
   final IconData saveIcon;
-  final Function(String value) onSave;
+  final void Function(String value) onSave;
 
   @override
   State<ActionTextFormField> createState() => _ActionTextFormFieldState();
@@ -25,7 +25,7 @@ class _ActionTextFormFieldState extends State<ActionTextFormField> {
   bool _isModified = false;
 
   // Butonun animasyonlu genişliği için bir sabit
-  final double _kButtonWidth = 56.0;
+  final double _kButtonWidth = 56;
 
   @override
   void initState() {
@@ -47,7 +47,7 @@ class _ActionTextFormFieldState extends State<ActionTextFormField> {
   // Controller her değiştiğinde bu fonksiyon çalışır
   void _handleTextChange() {
     // O anki metin, başlangıçtaki metinden farklı mı?
-    final bool currentlyModified = _controller.text != widget.initialValue;
+    final currentlyModified = _controller.text != widget.initialValue;
 
     // Durum değiştiyse (örn. false -> true olduysa) setState'i çağır
     if (_isModified != currentlyModified) {
@@ -88,7 +88,7 @@ class _ActionTextFormFieldState extends State<ActionTextFormField> {
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
     );
 
-    final BorderRadius defaultBorderRadius = BorderRadius.circular(10.0);
+    final defaultBorderRadius = BorderRadius.circular(10);
 
     return Material(
       elevation: 3,

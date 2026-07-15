@@ -28,7 +28,7 @@ final class SubsStorageProvider
         argument: null,
         retry: null,
         name: r'subsStorageProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -48,7 +48,7 @@ final class SubsStorageProvider
   }
 }
 
-String _$subsStorageHash() => r'2e3ce2bce27a4b50ba13ce6a41863ac5131f4985';
+String _$subsStorageHash() => r'd34a562d430304a2e0dcc8e8db2a01f74e768ca3';
 
 @ProviderFor(SubsController)
 @JsonPersist()
@@ -76,7 +76,7 @@ final class SubsControllerProvider
   SubsController create() => SubsController();
 }
 
-String _$subsControllerHash() => r'7735dbc7ab35ec79d398abb485c9c56fd782f555';
+String _$subsControllerHash() => r'935c80d3474c1f8ea28f1d536012cd52d1e82292';
 
 @JsonPersist()
 abstract class _$SubsControllerBase extends $AsyncNotifier<List<SubSlice>> {

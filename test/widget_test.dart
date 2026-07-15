@@ -17,14 +17,14 @@ import 'package:subs_tracker/providers/settings_controller.dart';
 import 'package:subs_tracker/providers/subs_controller.dart';
 
 void main() {
-  testWidgets('App smoke test', (WidgetTester tester) async {
+  testWidgets('App smoke test', (tester) async {
     // Override the settings and subs controllers to return a fixed state
     // This avoids database calls and platform channel issues
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          settingsControllerProvider.overrideWith(() => FakeSettingsController()),
-          subsControllerProvider.overrideWith(() => FakeSubsController()),
+          settingsControllerProvider.overrideWith(FakeSettingsController.new),
+          subsControllerProvider.overrideWith(FakeSubsController.new),
         ],
         child: const MyApp(),
       ),

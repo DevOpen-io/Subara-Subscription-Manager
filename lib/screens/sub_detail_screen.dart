@@ -5,11 +5,13 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:subs_tracker/models/sub_slice.dart';
-import 'package:subs_tracker/providers/settings_controller.dart';
-import 'package:subs_tracker/providers/subs_controller.dart';
-import 'package:subs_tracker/utils/color_palette.dart';
-import 'package:subs_tracker/widgets/brand_logo.dart';
+
+import '../models/sub_slice.dart';
+import '../providers/settings_controller.dart';
+import '../providers/subs_controller.dart';
+import '../utils/color_palette.dart';
+import '../widgets/brand_logo.dart';
+import '../widgets/status_picker.dart';
 
 // ---------------------------------------------------------------------------
 // Helper functions
@@ -70,7 +72,7 @@ void _showFrequencyPicker(
   SubSlice draft,
   void Function(SubSlice) onUpdate,
 ) {
-  final frequencies = Frequency.values;
+  const frequencies = Frequency.values;
   final initialIndex = frequencies.indexOf(draft.frequency);
 
   showCupertinoModalPopup<void>(
@@ -176,7 +178,7 @@ void _showColorPicker(
           final theme = Theme.of(ctx);
 
           Future<void> openCustom() async {
-            Color temp = currentColor;
+            var temp = currentColor;
             final result = await showDialog<Color>(
               context: ctx,
               builder: (dialogCtx) => StatefulBuilder(
@@ -187,7 +189,6 @@ void _showColorPicker(
                       pickerColor: temp,
                       onColorChanged: (c) => setS(() => temp = c),
                       enableAlpha: false,
-                      paletteType: PaletteType.hsvWithHue,
                       labelTypes: const [],
                       pickerAreaBorderRadius: const BorderRadius.all(Radius.circular(12)),
                     ),
@@ -413,6 +414,177 @@ void _showCategoryPicker(
   );
 }
 
+void _showReminderModePicker(
+  BuildContext context,
+  ReminderMode current,
+  ValueChanged<ReminderMode> onSelected,
+) {
+  showModalBottomSheet<void>(
+    context: context,
+    builder: (ctx) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              'detail.reminder'.tr(),
+              style: Theme.of(ctx).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+          ),
+          ...ReminderMode.values.map(
+            (mode) => ListTile(
+              title: Text('detail.reminder_${mode.name}'.tr()),
+              leading: mode == current
+                  ? Icon(Icons.radio_button_checked, color: Theme.of(ctx).colorScheme.primary)
+                  : const Icon(Icons.radio_button_unchecked),
+              onTap: () {
+                Navigator.of(ctx).pop();
+                onSelected(mode);
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    ),
+  );
+}
+
+void _showTrialEndPicker(
+  BuildContext context,
+  DateTime? current,
+  ValueChanged<DateTime> onSelected,
+) {
+  var selected = current ?? DateTime.now();
+  showCupertinoModalPopup<DateTime?>(
+    context: context,
+    builder: (ctx) {
+      final theme = Theme.of(ctx);
+      return ColoredBox(
+        color: theme.colorScheme.surface,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CupertinoButton(
+                  child: Text('detail.cancel'.tr()),
+                  onPressed: () => Navigator.of(ctx).pop(),
+                ),
+                CupertinoButton(
+                  child: Text('common.save'.tr()),
+                  onPressed: () => Navigator.of(ctx).pop(selected),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 216,
+              child: CupertinoDatePicker(
+                mode: CupertinoDatePickerMode.date,
+                initialDateTime: selected,
+                onDateTimeChanged: (date) => selected = date,
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  ).then((result) {
+    if (result != null) onSelected(result);
+  });
+}
+
+void _showCardInput(BuildContext context, String? current, ValueChanged<String?> onSelected) {
+  final controller = TextEditingController(text: current ?? '');
+  showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    builder: (ctx) {
+      return Padding(
+        padding: EdgeInsets.only(
+          left: 24, right: 24, top: 24,
+          bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text('detail.card_hint'.tr(), style: Theme.of(ctx).textTheme.titleMedium),
+            const SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              autofocus: true,
+              keyboardType: TextInputType.number,
+              maxLength: 4,
+              decoration: const InputDecoration(
+                hintText: '1234',
+                prefixText: '•••• ',
+                border: OutlineInputBorder(),
+              ),
+              onSubmitted: (val) {
+                Navigator.of(ctx).pop();
+                onSelected(val.isEmpty ? null : val);
+              },
+            ),
+            const SizedBox(height: 8),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                onSelected(controller.text.isEmpty ? null : controller.text);
+              },
+              child: Text('common.save'.tr()),
+            ),
+          ],
+        ),
+      );
+    },
+  ).whenComplete(controller.dispose);
+}
+
+void _showNoteInput(BuildContext context, String? current, ValueChanged<String?> onSelected) {
+  final controller = TextEditingController(text: current ?? '');
+  showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    builder: (ctx) {
+      return Padding(
+        padding: EdgeInsets.only(
+          left: 24, right: 24, top: 24,
+          bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text('detail.note'.tr(), style: Theme.of(ctx).textTheme.titleMedium),
+            const SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              autofocus: true,
+              maxLines: 4,
+              decoration: InputDecoration(
+                hintText: 'detail.note_hint'.tr(),
+                border: const OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 8),
+            FilledButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                final trimmed = controller.text.trim();
+                onSelected(trimmed.isEmpty ? null : trimmed);
+              },
+              child: Text('common.save'.tr()),
+            ),
+          ],
+        ),
+      );
+    },
+  ).whenComplete(controller.dispose);
+}
+
 // ---------------------------------------------------------------------------
 // Main screen
 // ---------------------------------------------------------------------------
@@ -526,13 +698,11 @@ class SubDetailScreen extends HookConsumerWidget {
               nameController: nameController,
               nameFocusNode: nameFocusNode,
               onSaveName: onSaveName,
-              onTapColor: liveSlice.brand == null
-                  ? () => _showColorPicker(
-                        context,
-                        draft.value.color,
-                        (c) => saveUpdate(draft.value.copyWith(color: c)),
-                      )
-                  : null,
+              onTapColor: () => _showColorPicker(
+              context,
+              draft.value.color,
+              (c) => saveUpdate(draft.value.copyWith(color: c)),
+            ),
             ),
             const SizedBox(height: 24),
             Padding(
@@ -554,13 +724,11 @@ class SubDetailScreen extends HookConsumerWidget {
                 slice: draft.value,
                 onTapFrequency: () => _showFrequencyPicker(context, draft.value, saveUpdate),
                 onTapDate: () => _showDatePicker(context, draft.value, saveUpdate),
-                onTapColor: draft.value.brand == null
-                    ? () => _showColorPicker(
-                          context,
-                          draft.value.color,
-                          (c) => saveUpdate(draft.value.copyWith(color: c)),
-                        )
-                    : null,
+                onTapColor: () => _showColorPicker(
+                  context,
+                  draft.value.color,
+                  (c) => saveUpdate(draft.value.copyWith(color: c)),
+                ),
                 onTapCategory: draft.value.brand == null
                     ? () => _showCategoryPicker(
                           context,
@@ -568,6 +736,15 @@ class SubDetailScreen extends HookConsumerWidget {
                           (cat) => saveUpdate(draft.value.copyWith(category: cat)),
                         )
                     : null,
+                onTapReminder: () => _showReminderModePicker(
+                  context,
+                  draft.value.reminderMode,
+                  (mode) => saveUpdate(draft.value.copyWith(reminderMode: mode)),
+                ),
+                onTapCard: () => _showCardInput(context, draft.value.cardLastFour, (val) => saveUpdate(draft.value.copyWith(cardLastFour: val))),
+                onTapNote: () => _showNoteInput(context, draft.value.note, (val) => saveUpdate(draft.value.copyWith(note: val))),
+                onTapStatus: () => showStatusPicker(context, draft.value.status, (status) => saveUpdate(draft.value.copyWith(status: status))),
+                onTapTrialEnds: () => _showTrialEndPicker(context, draft.value.trialEndDate, (date) => saveUpdate(draft.value.copyWith(trialEndDate: date))),
               ),
             ),
             const SizedBox(height: 28),
@@ -612,10 +789,9 @@ class _HeroSection extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           GestureDetector(
-            onTap: slice.brand == null ? onTapColor : null,
+            onTap: onTapColor,
             child: slice.brand != null
                 ? BrandLogo(brand: slice.brand, size: 72)
                 : Container(
@@ -644,7 +820,6 @@ class _HeroSection extends StatelessWidget {
               children: [
                 if (slice.brand == null)
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
                         child: EditableText(
@@ -682,6 +857,10 @@ class _HeroSection extends StatelessWidget {
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
+                ],
+                if (slice.status != SubStatus.active) ...[
+                  const SizedBox(height: 6),
+                  StatusBadge(status: slice.status),
                 ],
               ],
             ),
@@ -741,7 +920,7 @@ class _StatCardsRow extends StatelessWidget {
         Expanded(
           child: _StatCard(
             label: 'detail.next_charge'.tr(),
-            value: DateFormat('MMM d').format(nextChargeDate),
+            value: DateFormat('MMM d', context.locale.toString()).format(nextChargeDate),
             sub: nextSub,
           ),
         ),
@@ -789,36 +968,39 @@ class _StatCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           if (controller != null && focusNode != null && onSave != null)
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Flexible(
-                  child: EditableText(
-                    onTapOutside: (event) {
-                      if (focusNode!.hasFocus) {
-                        focusNode!.unfocus();
-                        onSave!();
-                      }
-                    },
-                    controller: controller!,
-                    focusNode: focusNode!,
-                    style: theme.textTheme.headlineSmall!.copyWith(
-                      fontWeight: FontWeight.w700,
+            GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () => focusNode!.requestFocus(),
+              child: Row(
+                children: [
+                  Flexible(
+                    child: EditableText(
+                      onTapOutside: (event) {
+                        if (focusNode!.hasFocus) {
+                          focusNode!.unfocus();
+                          onSave!();
+                        }
+                      },
+                      controller: controller!,
+                      focusNode: focusNode!,
+                      style: theme.textTheme.headlineSmall!.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                      cursorColor: theme.colorScheme.primary,
+                      backgroundCursorColor: theme.colorScheme.onSurfaceVariant,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      onSubmitted: (_) => onSave!(),
+                      textInputAction: TextInputAction.done,
                     ),
-                    cursorColor: theme.colorScheme.primary,
-                    backgroundCursorColor: theme.colorScheme.onSurfaceVariant,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    onSubmitted: (_) => onSave!(),
-                    textInputAction: TextInputAction.done,
                   ),
-                ),
-                const SizedBox(width: 4),
-                Icon(
-                  Icons.edit_outlined,
-                  size: 14,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ],
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.edit_outlined,
+                    size: 14,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ],
+              ),
             )
           else
             Text(
@@ -851,6 +1033,11 @@ class _DetailsSection extends StatelessWidget {
     required this.onTapDate,
     this.onTapColor,
     this.onTapCategory,
+    required this.onTapReminder,
+    required this.onTapCard,
+    required this.onTapStatus,
+    required this.onTapTrialEnds,
+    required this.onTapNote,
   });
 
   final SubSlice slice;
@@ -858,6 +1045,11 @@ class _DetailsSection extends StatelessWidget {
   final VoidCallback onTapDate;
   final VoidCallback? onTapColor;
   final VoidCallback? onTapCategory;
+  final VoidCallback onTapReminder;
+  final VoidCallback onTapCard;
+  final VoidCallback onTapStatus;
+  final VoidCallback onTapTrialEnds;
+  final VoidCallback onTapNote;
 
   @override
   Widget build(BuildContext context) {
@@ -874,10 +1066,25 @@ class _DetailsSection extends StatelessWidget {
         hasChevron: true,
         onTap: onTapFrequency,
       ),
+      _DetailRow(
+        label: 'detail.status'.tr(),
+        value: 'detail.status_${slice.status.name}'.tr(),
+        hasChevron: true,
+        onTap: onTapStatus,
+      ),
+      if (slice.status == SubStatus.freeTrial)
+        _DetailRow(
+          label: 'detail.trial_ends'.tr(),
+          value: slice.trialEndDate != null
+              ? DateFormat('MMM d, y', context.locale.toString()).format(slice.trialEndDate!)
+              : 'detail.not_set'.tr(),
+          hasChevron: true,
+          onTap: onTapTrialEnds,
+        ),
       _ColorDetailRow(color: Color(slice.color), onTap: onTapColor, hasChevron: onTapColor != null),
       _DetailRow(
         label: 'detail.started'.tr(),
-        value: DateFormat('MMM d, y').format(slice.startDate),
+        value: DateFormat('MMM d, y', context.locale.toString()).format(slice.startDate),
         hasChevron: true,
         onTap: onTapDate,
       ),
@@ -889,11 +1096,21 @@ class _DetailsSection extends StatelessWidget {
       ),
       _DetailRow(
         label: 'detail.payment_method'.tr(),
-        value: 'detail.not_set'.tr(),
+        value: slice.cardLastFour != null ? '•••• ${slice.cardLastFour}' : 'detail.not_set'.tr(),
+        hasChevron: true,
+        onTap: onTapCard,
       ),
       _DetailRow(
         label: 'detail.reminder'.tr(),
-        value: 'detail.not_set'.tr(),
+        value: 'detail.reminder_${slice.reminderMode.name}'.tr(),
+        hasChevron: true,
+        onTap: onTapReminder,
+      ),
+      _DetailRow(
+        label: 'detail.note'.tr(),
+        value: slice.note ?? 'detail.not_set'.tr(),
+        hasChevron: true,
+        onTap: onTapNote,
       ),
     ];
 
@@ -922,7 +1139,7 @@ class _DetailsSection extends StatelessWidget {
         ),
         ClipRRect(
           borderRadius: BorderRadius.circular(14),
-          child: Container(
+          child: DecoratedBox(
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainer,
             ),
@@ -1008,7 +1225,6 @@ class _ColorDetailRow extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: theme.colorScheme.outline.withValues(alpha: 0.3),
-                  width: 1,
                 ),
               ),
             ),
@@ -1074,7 +1290,7 @@ class _PaymentHistorySection extends StatelessWidget {
         if (history.isNotEmpty)
           ClipRRect(
             borderRadius: BorderRadius.circular(14),
-            child: Container(
+            child: DecoratedBox(
               decoration: BoxDecoration(
                 color: theme.colorScheme.surfaceContainer,
               ),
@@ -1120,7 +1336,7 @@ class _PaymentHistoryRow extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            DateFormat('MMM dd').format(date),
+            DateFormat('MMM dd', context.locale.toString()).format(date),
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w500,
             ),

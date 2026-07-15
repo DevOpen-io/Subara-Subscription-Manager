@@ -13,21 +13,20 @@ class MockSubsController extends SubsController {
     return [
       SubSlice(
         name: 'Netflix',
-        amount: 15.0,
+        amount: 15,
         color: 0xFF000000,
         startDate: DateTime.now(),
-        frequency: Frequency.monthly,
       ),
     ];
   }
 }
 
 void main() {
-  testWidgets('CalendarScreen renders and shows events', (WidgetTester tester) async {
+  testWidgets('CalendarScreen renders and shows events', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          subsControllerProvider.overrideWith(() => MockSubsController()),
+          subsControllerProvider.overrideWith(MockSubsController.new),
         ],
         child: const MaterialApp(
           home: CalendarScreen(),

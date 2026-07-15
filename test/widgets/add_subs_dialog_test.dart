@@ -12,16 +12,14 @@ class FakeBrands extends Brands {
   @override
   Future<List<Brand>> build() async {
     return [
-      const Brand(text: 'Netflix', logo: null),
-      const Brand(text: 'Spotify', logo: null),
+      const Brand(text: 'Netflix'),
+      const Brand(text: 'Spotify'),
     ];
   }
 }
 
 // Mock SubsController
 class MockSubsController extends SubsController {
-  List<SubSlice> addedSlices = [];
-
   @override
   Future<List<SubSlice>> build() async {
     return [];
@@ -29,18 +27,18 @@ class MockSubsController extends SubsController {
 
   @override
   void addSlice(SubSlice slice) {
-    addedSlices.add(slice);
+    state = AsyncData([...(state.value ?? []), slice]);
   }
 }
 
 void main() {
-  testWidgets('AddSubsDialog allows adding a subscription', (WidgetTester tester) async {
+  testWidgets('AddSubsDialog allows adding a subscription', (tester) async {
     final mockSubsController = MockSubsController();
 
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          brandsProvider.overrideWith(() => FakeBrands()),
+          brandsProvider.overrideWith(FakeBrands.new),
           subsControllerProvider.overrideWith(() => mockSubsController),
         ],
         child: const MaterialApp(
@@ -82,9 +80,9 @@ void main() {
     await tester.pump();
 
     // Verify slice was added
-    expect(mockSubsController.addedSlices, hasLength(1));
-    expect(mockSubsController.addedSlices.first.name, 'My Sub');
-    expect(mockSubsController.addedSlices.first.amount, 10.0);
-    expect(mockSubsController.addedSlices.first.frequency, Frequency.weekly);
+    expect(mockSubsController.state.value, hasLength(1));
+    expect(mockSubsController.state.value!.first.name, 'My Sub');
+    expect(mockSubsController.state.value!.first.amount, 10.0);
+    expect(mockSubsController.state.value!.first.frequency, Frequency.weekly);
   });
 }

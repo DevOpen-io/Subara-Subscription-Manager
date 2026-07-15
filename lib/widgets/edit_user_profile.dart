@@ -1,8 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:subs_tracker/providers/settings_controller.dart';
-import 'package:subs_tracker/widgets/action_text_form_field.dart';
+import '../providers/settings_controller.dart';
+import 'action_text_form_field.dart';
 
 class EditUserProfileDialog extends ConsumerStatefulWidget {
   const EditUserProfileDialog({super.key});
@@ -17,7 +17,7 @@ class _ChooseOrEditPPState extends ConsumerState<EditUserProfileDialog> {
     final settingsController = ref.watch(settingsControllerProvider);
 
     return AlertDialog.adaptive(
-      title: Text("intro.edit_picture".tr()),
+      title: Text('intro.edit_picture'.tr()),
       content: settingsController.when(
         error: (e, st) => Center(child: Text('Error: $e')),
         loading: () =>
@@ -36,22 +36,22 @@ class _ChooseOrEditPPState extends ConsumerState<EditUserProfileDialog> {
               ),
               const Divider(height: 32),
               ActionTextFormField(
-                labelText: "intro.username_label".tr(),
-                initialValue: slice.userName ?? "",
+                labelText: 'intro.username_label'.tr(),
+                initialValue: slice.userName ?? '',
                 onSave: (newUserName) {
                   ref
                       .read(settingsControllerProvider.notifier)
                       .updateUserName(newUserName);
 
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("intro.username_saved".tr())),
+                    SnackBar(content: Text('intro.username_saved'.tr())),
                   );
                 },
               ),
               const SizedBox(height: 8),
               ActionTextFormField(
-                labelText: "intro.email_label".tr(),
-                initialValue: slice.email ?? "",
+                labelText: 'intro.email_label'.tr(),
+                initialValue: slice.email ?? '',
                 onSave: (newEmail) {
                   ref
                       .read(settingsControllerProvider.notifier)
@@ -59,7 +59,7 @@ class _ChooseOrEditPPState extends ConsumerState<EditUserProfileDialog> {
 
                   ScaffoldMessenger.of(
                     context,
-                  ).showSnackBar(SnackBar(content: Text("intro.email_saved".tr())));
+                  ).showSnackBar(SnackBar(content: Text('intro.email_saved'.tr())));
                 },
               ),
             ],

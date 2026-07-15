@@ -24,17 +24,17 @@ class LocalNotificationService implements NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  Future<List<PendingNotificationRequest>> get scheduledNotifications async =>
-      await flutterLocalNotificationsPlugin.pendingNotificationRequests();
+  Future<List<PendingNotificationRequest>> get scheduledNotifications =>
+      flutterLocalNotificationsPlugin.pendingNotificationRequests();
   @override
   Future<void> init() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
+    const initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    const DarwinInitializationSettings initializationSettingsIOS =
+    const initializationSettingsIOS =
         DarwinInitializationSettings();
 
-    const InitializationSettings initializationSettings =
+    const initializationSettings =
         InitializationSettings(
           android: initializationSettingsAndroid,
           iOS: initializationSettingsIOS,
@@ -42,7 +42,7 @@ class LocalNotificationService implements NotificationService {
 
     tz.initializeTimeZones();
 
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    await flutterLocalNotificationsPlugin.initialize(settings: initializationSettings);
 
     // ANDROID 13+: ask for runtime permission
     final androidImpl = flutterLocalNotificationsPlugin
@@ -68,11 +68,11 @@ class LocalNotificationService implements NotificationService {
     DateTimeComponents? matchDateTimeComponents,
   }) async {
     await flutterLocalNotificationsPlugin.zonedSchedule(
-      id,
-      title,
-      body,
-      tz.TZDateTime.from(scheduledDate, tz.local),
-      const NotificationDetails(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: tz.TZDateTime.from(scheduledDate, tz.local),
+      notificationDetails: const NotificationDetails(
         iOS: DarwinNotificationDetails(),
         android: AndroidNotificationDetails(
           'subscription_channel_id',
@@ -88,7 +88,7 @@ class LocalNotificationService implements NotificationService {
 
   @override
   Future<void> cancelNotification(int id) async {
-    await flutterLocalNotificationsPlugin.cancel(id);
+    await flutterLocalNotificationsPlugin.cancel(id: id);
   }
 
   @override

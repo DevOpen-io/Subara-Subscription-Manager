@@ -1,8 +1,7 @@
-import 'dart:ui';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'package:motor/motor.dart';
 
 const _snappyMotion = CupertinoMotion.snappy();
@@ -72,22 +71,20 @@ class _GlassNavBarState extends State<GlassNavBar>
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Container(
-      
       margin: EdgeInsets.only(left: 16, right: 16, bottom: 16 + bottomPadding),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Container(
-            decoration: BoxDecoration(
-              color: cs.surfaceContainerHighest.withValues(alpha: 0.75),
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(
-                color: cs.outline.withValues(alpha: 0.2),
-                width: 1,
-              ),
-            ),
-            child: LayoutBuilder(
+      child: LiquidGlassLayer(
+        settings: const LiquidGlassSettings(
+          blur: 18,
+          glassColor: Color.fromARGB(20, 255, 255, 255),
+          thickness: 32,
+          refractiveIndex: 1.45,
+          lightIntensity: 0.92,
+          ambientStrength: 0.25,
+          saturation: 1.9,
+        ),
+        child: LiquidGlass(
+          shape: const LiquidRoundedSuperellipse(borderRadius: 28),
+          child: LayoutBuilder(
               builder: (context, constraints) {
                 final tabWidth = constraints.maxWidth / _tabs.length;
                 return AnimatedBuilder(
@@ -169,7 +166,6 @@ class _GlassNavBarState extends State<GlassNavBar>
             ),
           ),
         ),
-      ),
     );
   }
 }

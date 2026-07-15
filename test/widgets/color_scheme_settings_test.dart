@@ -6,7 +6,7 @@ import 'package:subs_tracker/models/settings_view_model.dart';
 void main() {
   group('SettingsViewModel colorScheme', () {
     test('serializes FlexScheme by name string', () {
-      final vm = SettingsViewModel(
+      const vm = SettingsViewModel(
         theme: ThemeMode.light,
         currency: Currency.usd,
         colorScheme: FlexScheme.deepPurple,

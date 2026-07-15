@@ -7,18 +7,16 @@ import 'package:riverpod_annotation/experimental/persist.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_sqflite/riverpod_sqflite.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:subs_tracker/models/brand.dart';
+import '../models/brand.dart';
 
 part 'brands_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 Future<JsonSqFliteStorage> brandsStorage(Ref ref) async {
-  JsonSqFliteStorage storage = await JsonSqFliteStorage.open(
+  final storage = await JsonSqFliteStorage.open(
     join(await getDatabasesPath(), 'brands.db'),
   );
-  ref
-    ..onDispose(storage.close)
-    ..keepAlive();
+  ref.onDispose(storage.close);
   return storage;
 }
 
@@ -29,9 +27,9 @@ class Brands extends _$Brands {
   FutureOr<List<Brand>> build() async {
     await persist(
       ref.watch(brandsStorageProvider.future),
-      options: StorageOptions(
+      options: const StorageOptions(
         cacheTime: StorageCacheTime.unsafe_forever,
-        destroyKey: "v3",
+        destroyKey: 'v3',
       ),
     ).future;
     if (state.value != null) {

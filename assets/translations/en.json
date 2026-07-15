@@ -16,7 +16,10 @@
 		"select_language": "Select Language",
 		"about": "About",
 		"version": "Version",
-		"app_name": "SubZilla"
+		"app_name": "SubZilla",
+		"notifications_title": "Notifications",
+		"notify_due_today": "Due today reminders",
+		"notify_due_tomorrow": "Due tomorrow reminders"
 	},
 	"home": {
 		"no_subs": "Subscription Data Not Added Yet.",
@@ -33,7 +36,18 @@
 		"renews_today_alert_subtitle": "{} subscription(s) renew today",
 		"renews_today_badge": "Today",
 		"sort_soonest": "Soonest",
-		"sort_default": "Default"
+		"sort_default": "Default",
+		"renewing_soon": "Renewing soon",
+		"tomorrow": "Tomorrow",
+		"sort": "Sort",
+		"sort_title": "Sort Subscriptions",
+		"sort_name_asc": "Name A → Z",
+		"sort_name_desc": "Name Z → A",
+		"sort_amount_asc": "Amount (low to high)",
+		"sort_amount_desc": "Amount (high to low)",
+		"total_spending_yearly": "Total Yearly Spending",
+		"view_monthly": "Monthly",
+		"view_yearly": "Yearly"
 	},
 	"frequency": {
 		"daily": "Daily",
@@ -89,7 +103,8 @@
 		"next": "Next",
 		"finish": "Finish",
 		"error_generic": "Something went wrong",
-		"second_page": "Second Page"
+		"second_page": "Second Page",
+		"save": "Save"
 	},
 	"dialogs": {
 		"add_title": "Add Subscription",
@@ -118,7 +133,10 @@
 		"name_label": "Name",
 		"search_placeholder": "Search {}+ services",
 		"popular": "POPULAR",
-		"or_enter_manually": "OR ENTER MANUALLY"
+		"or_enter_manually": "OR ENTER MANUALLY",
+		"note_label": "Note",
+		"status_label": "Status",
+		"trial_ends_label": "Trial ends"
 	},
 	"menu": {
 		"main_menu": "Main Menu",
@@ -165,7 +183,10 @@
 		"percent_total": "% of total",
 		"period_month": "Month",
 		"period_quarter": "3 Months",
-		"period_year": "Year"
+		"period_year": "Year",
+		"chart_title": "Spend Overview",
+		"chart_mode_amount": "Amount",
+		"chart_mode_share": "Share"
 	},
 	"frequency_names": {
 		"daily": "DAILY",
@@ -191,10 +212,23 @@
 		"color": "Color",
 		"custom_color": "Custom",
 		"reminder": "Reminder",
+		"reminder_none": "Off",
+		"reminder_onDay": "On day",
+		"reminder_dayBefore": "Day before",
+		"reminder_both": "All",
 		"not_set": "—",
 		"delete": "Delete Subscription",
 		"delete_confirm": "Are you sure you want to delete {}?",
 		"delete_action": "Delete",
-		"cancel": "Cancel"
+		"cancel": "Cancel",
+		"card_hint": "Last 4 digits",
+		"note": "Note",
+		"note_hint": "Add a note",
+		"status": "Status",
+		"status_active": "Active",
+		"status_freeTrial": "Free Trial",
+		"status_paused": "Paused",
+		"status_cancelled": "Cancelled",
+		"trial_ends": "Trial ends"
 	}
 }

@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:subs_tracker/providers/settings_controller.dart';
+import '../providers/settings_controller.dart';
 
 class ProfilePage extends HookConsumerWidget {
   const ProfilePage({super.key});
@@ -13,9 +13,8 @@ class ProfilePage extends HookConsumerWidget {
 
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(32.0, 60.0, 32.0, 24.0),
+        padding: const EdgeInsets.fromLTRB(32, 60, 32, 24),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             // Profile Image Preview
             Container(
@@ -54,7 +53,7 @@ class ProfilePage extends HookConsumerWidget {
             const SizedBox(height: 16),
 
             // Email Input
-            Container(
+            DecoratedBox(
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),

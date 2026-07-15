@@ -1,6 +1,6 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:subs_tracker/utils/app_theme.dart';
+import '../utils/app_theme.dart';
 
 class ColorSchemePicker extends StatelessWidget {
   const ColorSchemePicker({

@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:subs_tracker/models/brand.dart';
-import 'package:subs_tracker/models/sub_slice.dart';
-import 'package:subs_tracker/providers/brands_provider.dart';
-import 'package:subs_tracker/providers/subs_controller.dart';
-import 'package:subs_tracker/utils/color_palette.dart';
-import 'package:subs_tracker/widgets/brand_logo.dart';
+import '../models/brand.dart';
+import '../models/sub_slice.dart';
+import '../providers/brands_provider.dart';
+import '../providers/subs_controller.dart';
+import '../utils/color_palette.dart';
+import 'brand_logo.dart';
 
 class EditSubsDialog extends HookConsumerWidget {
   const EditSubsDialog({
@@ -22,7 +22,7 @@ class EditSubsDialog extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final formKey = useMemoized(() => GlobalKey<FormState>());
+    final formKey = useMemoized(GlobalKey<FormState>.new);
     final nameCtrl = useTextEditingController(text: slice.name);
     final amountCtrl = useTextEditingController(text: slice.amount.toString());
     final brandFocusNode = useFocusNode();
@@ -31,8 +31,8 @@ class EditSubsDialog extends HookConsumerWidget {
     final theme = Theme.of(context);
 
     Future<void> openCustomColorPicker() async {
-      Color tempColor = Color(draftSlice.value.color);
-      final Color? result = await showDialog<Color>(
+      var tempColor = Color(draftSlice.value.color);
+      final result = await showDialog<Color>(
         context: context,
         builder: (dialogContext) {
           return StatefulBuilder(
@@ -46,7 +46,6 @@ class EditSubsDialog extends HookConsumerWidget {
                       tempColor = color;
                     }),
                     enableAlpha: false,
-                    paletteType: PaletteType.hsvWithHue,
                     labelTypes: const [],
                     pickerAreaBorderRadius: const BorderRadius.all(
                       Radius.circular(12),
@@ -75,7 +74,7 @@ class EditSubsDialog extends HookConsumerWidget {
     }
 
     void onSave() {
-      if (formKey.currentState?.validate() == true) {
+      if (formKey.currentState?.validate() ?? false) {
         final amount = double.parse(amountCtrl.text.replaceAll(',', '.'));
         ref.read(subsControllerProvider.notifier).updateAt(
           index,
@@ -157,17 +156,17 @@ class EditSubsDialog extends HookConsumerWidget {
                       textEditingController: nameCtrl,
                       focusNode: brandFocusNode,
                       displayStringForOption: (option) => option.text,
-                      optionsBuilder: (TextEditingValue textEditingValue) {
+                      optionsBuilder: (textEditingValue) {
                         if (textEditingValue.text.trim().isEmpty) {
                           return const Iterable<Brand>.empty();
                         }
                         final query = textEditingValue.text.toLowerCase();
                         return allBrands.where(
-                          (Brand option) =>
+                          (option) =>
                               option.text.toLowerCase().contains(query),
                         );
                       },
-                      onSelected: (Brand selection) {
+                      onSelected: (selection) {
                         draftSlice.value = draftSlice.value.copyWith(
                           brand: selection,
                           name: selection.text,
@@ -196,13 +195,12 @@ class EditSubsDialog extends HookConsumerWidget {
                                     padding: const EdgeInsets.all(8),
                                     child: BrandLogo(
                                       brand: draftSlice.value.brand,
-                                      size: 32,
                                     ),
                                   )
                                 : const Icon(Icons.search),
                             suffixIcon: draftSlice.value.brand != null
                                 ? Tooltip(
-                                    message: "dialogs.selected_tooltip".tr(
+                                    message: 'dialogs.selected_tooltip'.tr(
                                       args: [draftSlice.value.brand!.text],
                                     ),
                                     child: Icon(
@@ -245,7 +243,7 @@ class EditSubsDialog extends HookConsumerWidget {
                                 separatorBuilder: (_, _) =>
                                     const Divider(height: 0),
                                 itemBuilder: (context, index) {
-                                  final Brand option = options.elementAt(index);
+                                  final option = options.elementAt(index);
                                   return ListTile(
                                     leading: BrandLogo(
                                       brand: option,
@@ -339,7 +337,7 @@ class EditSubsDialog extends HookConsumerWidget {
                         return DropdownMenuItem(
                           value: f,
                           child: Text(
-                            "frequency_names.${f.name.toLowerCase()}".tr(),
+                            'frequency.${f.name}'.tr(),
                           ),
                         );
                       }).toList(),

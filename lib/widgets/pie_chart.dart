@@ -1,32 +1,25 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:subs_tracker/models/brand.dart';
-import 'package:subs_tracker/models/sub_slice.dart';
-import 'package:subs_tracker/providers/subs_controller.dart';
-import 'package:subs_tracker/utils/color_utils.dart';
-import 'package:subs_tracker/widgets/brand_logo.dart';
+import '../models/brand.dart';
+import '../models/sub_slice.dart';
+import '../utils/color_utils.dart';
+import 'brand_logo.dart';
 
-class SubsPie extends ConsumerStatefulWidget {
-  const SubsPie({super.key});
+class SubsPie extends StatefulWidget {
+  const SubsPie({super.key, required this.slices});
+
+  final List<SubSlice> slices;
 
   @override
-  ConsumerState<SubsPie> createState() => _SubsPieState();
+  State<SubsPie> createState() => _SubsPieState();
 }
 
-class _SubsPieState extends ConsumerState<SubsPie> {
+class _SubsPieState extends State<SubsPie> {
   int? touchedIndex;
 
   @override
   Widget build(BuildContext context) {
-    final slicesAsync = ref.watch(subsControllerProvider);
-
-    return slicesAsync.when(
-      error: (e, st) => Center(child: Text("common.error_generic".tr())),
-      loading: () => const Center(child: CircularProgressIndicator.adaptive()),
-      data: (slices) => _buildChart(slices),
-    );
+    return _buildChart(widget.slices);
   }
 
   Widget _buildChart(List<SubSlice> slices) {
@@ -75,7 +68,6 @@ class _SubsPieState extends ConsumerState<SubsPie> {
             duration: const Duration(milliseconds: 100),
           ),
         ),
-        const SizedBox(height: 12),
       ],
     );
   }
@@ -89,7 +81,7 @@ class _Badge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(10),

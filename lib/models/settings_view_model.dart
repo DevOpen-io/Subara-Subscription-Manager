@@ -9,17 +9,17 @@ part 'settings_view_model.g.dart';
 
 enum Currency {
   try_('₺', 'Turkish Lira'),
-  usd('\$', 'US Dollar'),
+  usd(r'$', 'US Dollar'),
   eur('€', 'Euro'),
   gbp('£', 'British Pound'),
   jpy('¥', 'Japanese Yen'),
-  cad('C\$', 'Canadian Dollar'),
-  aud('A\$', 'Australian Dollar');
+  cad(r'C$', 'Canadian Dollar'),
+  aud(r'A$', 'Australian Dollar');
+
+  const Currency(this.symbol, this.label);
 
   final String symbol;
   final String label;
-
-  const Currency(this.symbol, this.label);
 }
 
 @freezed
@@ -40,11 +40,11 @@ abstract class SettingsViewModel with _$SettingsViewModel {
       _$SettingsViewModelFromJson(json);
 }
 
-class Uint8ListConverter implements JsonConverter<Uint8List?, List?> {
+class Uint8ListConverter implements JsonConverter<Uint8List?, List<dynamic>?> {
   const Uint8ListConverter();
 
   @override
-  Uint8List? fromJson(List? json) {
+  Uint8List? fromJson(List<dynamic>? json) {
     if (json == null) return null;
     return Uint8List.fromList(List.from(json));
   }

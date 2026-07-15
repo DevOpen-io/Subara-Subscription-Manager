@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:subs_tracker/layout/root_layout.dart';
+import '../layout/root_layout.dart';
 
 class SubZillaAppBar extends StatelessWidget implements PreferredSizeWidget {
   const SubZillaAppBar({this.trailing, super.key});
@@ -14,16 +14,15 @@ class SubZillaAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return CupertinoNavigationBar(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      automaticallyImplyLeading: true,
-      leading: rootScaffoldKey.currentState?.hasDrawer == true
+      leading: rootScaffoldKey.currentState?.hasDrawer ?? false
           ? IconButton(
-              icon: Icon(CupertinoIcons.bars),
+              icon: const Icon(CupertinoIcons.bars),
               onPressed: () {
                 rootScaffoldKey.currentState?.openDrawer();
               },
             )
           : null,
-      middle: Text("settings.app_name".tr()),
+      middle: Text('settings.app_name'.tr()),
       trailing: trailing,
     );
   }

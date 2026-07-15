@@ -4,7 +4,7 @@ import 'package:subs_tracker/screens/intro_page.dart';
 
 void main() {
   testWidgets('IntroPage calls onGetStarted when CTA tapped', (tester) async {
-    bool called = false;
+    var called = false;
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(

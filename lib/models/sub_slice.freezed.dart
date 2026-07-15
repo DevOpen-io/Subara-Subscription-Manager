@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SubSlice {
 
- Brand? get brand; String get name; double get amount; int get color; DateTime get startDate; Frequency get frequency; String? get category;
+ Brand? get brand; String get name; double get amount; int get color; DateTime get startDate; Frequency get frequency; String? get category; ReminderMode get reminderMode; String? get cardLastFour; SubStatus get status; String? get note; DateTime? get trialEndDate;
 /// Create a copy of SubSlice
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $SubSliceCopyWith<SubSlice> get copyWith => _$SubSliceCopyWithImpl<SubSlice>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SubSlice&&(identical(other.brand, brand) || other.brand == brand)&&(identical(other.name, name) || other.name == name)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.color, color) || other.color == color)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.frequency, frequency) || other.frequency == frequency)&&(identical(other.category, category) || other.category == category));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SubSlice&&(identical(other.brand, brand) || other.brand == brand)&&(identical(other.name, name) || other.name == name)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.color, color) || other.color == color)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.frequency, frequency) || other.frequency == frequency)&&(identical(other.category, category) || other.category == category)&&(identical(other.reminderMode, reminderMode) || other.reminderMode == reminderMode)&&(identical(other.cardLastFour, cardLastFour) || other.cardLastFour == cardLastFour)&&(identical(other.status, status) || other.status == status)&&(identical(other.note, note) || other.note == note)&&(identical(other.trialEndDate, trialEndDate) || other.trialEndDate == trialEndDate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,brand,name,amount,color,startDate,frequency,category);
+int get hashCode => Object.hash(runtimeType,brand,name,amount,color,startDate,frequency,category,reminderMode,cardLastFour,status,note,trialEndDate);
 
 @override
 String toString() {
-  return 'SubSlice(brand: $brand, name: $name, amount: $amount, color: $color, startDate: $startDate, frequency: $frequency, category: $category)';
+  return 'SubSlice(brand: $brand, name: $name, amount: $amount, color: $color, startDate: $startDate, frequency: $frequency, category: $category, reminderMode: $reminderMode, cardLastFour: $cardLastFour, status: $status, note: $note, trialEndDate: $trialEndDate)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $SubSliceCopyWith<$Res>  {
   factory $SubSliceCopyWith(SubSlice value, $Res Function(SubSlice) _then) = _$SubSliceCopyWithImpl;
 @useResult
 $Res call({
- Brand? brand, String name, double amount, int color, DateTime startDate, Frequency frequency, String? category
+ Brand? brand, String name, double amount, int color, DateTime startDate, Frequency frequency, String? category, ReminderMode reminderMode, String? cardLastFour, SubStatus status, String? note, DateTime? trialEndDate
 });
 
 
@@ -65,7 +65,7 @@ class _$SubSliceCopyWithImpl<$Res>
 
 /// Create a copy of SubSlice
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? brand = freezed,Object? name = null,Object? amount = null,Object? color = null,Object? startDate = null,Object? frequency = null,Object? category = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? brand = freezed,Object? name = null,Object? amount = null,Object? color = null,Object? startDate = null,Object? frequency = null,Object? category = freezed,Object? reminderMode = null,Object? cardLastFour = freezed,Object? status = null,Object? note = freezed,Object? trialEndDate = freezed,}) {
   return _then(_self.copyWith(
 brand: freezed == brand ? _self.brand : brand // ignore: cast_nullable_to_non_nullable
 as Brand?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -74,7 +74,12 @@ as double,color: null == color ? _self.color : color // ignore: cast_nullable_to
 as int,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
 as DateTime,frequency: null == frequency ? _self.frequency : frequency // ignore: cast_nullable_to_non_nullable
 as Frequency,category: freezed == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,reminderMode: null == reminderMode ? _self.reminderMode : reminderMode // ignore: cast_nullable_to_non_nullable
+as ReminderMode,cardLastFour: freezed == cardLastFour ? _self.cardLastFour : cardLastFour // ignore: cast_nullable_to_non_nullable
+as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as SubStatus,note: freezed == note ? _self.note : note // ignore: cast_nullable_to_non_nullable
+as String?,trialEndDate: freezed == trialEndDate ? _self.trialEndDate : trialEndDate // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 /// Create a copy of SubSlice
@@ -171,10 +176,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Brand? brand,  String name,  double amount,  int color,  DateTime startDate,  Frequency frequency,  String? category)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Brand? brand,  String name,  double amount,  int color,  DateTime startDate,  Frequency frequency,  String? category,  ReminderMode reminderMode,  String? cardLastFour,  SubStatus status,  String? note,  DateTime? trialEndDate)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SubSlice() when $default != null:
-return $default(_that.brand,_that.name,_that.amount,_that.color,_that.startDate,_that.frequency,_that.category);case _:
+return $default(_that.brand,_that.name,_that.amount,_that.color,_that.startDate,_that.frequency,_that.category,_that.reminderMode,_that.cardLastFour,_that.status,_that.note,_that.trialEndDate);case _:
   return orElse();
 
 }
@@ -192,10 +197,10 @@ return $default(_that.brand,_that.name,_that.amount,_that.color,_that.startDate,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Brand? brand,  String name,  double amount,  int color,  DateTime startDate,  Frequency frequency,  String? category)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Brand? brand,  String name,  double amount,  int color,  DateTime startDate,  Frequency frequency,  String? category,  ReminderMode reminderMode,  String? cardLastFour,  SubStatus status,  String? note,  DateTime? trialEndDate)  $default,) {final _that = this;
 switch (_that) {
 case _SubSlice():
-return $default(_that.brand,_that.name,_that.amount,_that.color,_that.startDate,_that.frequency,_that.category);case _:
+return $default(_that.brand,_that.name,_that.amount,_that.color,_that.startDate,_that.frequency,_that.category,_that.reminderMode,_that.cardLastFour,_that.status,_that.note,_that.trialEndDate);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -212,10 +217,10 @@ return $default(_that.brand,_that.name,_that.amount,_that.color,_that.startDate,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Brand? brand,  String name,  double amount,  int color,  DateTime startDate,  Frequency frequency,  String? category)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Brand? brand,  String name,  double amount,  int color,  DateTime startDate,  Frequency frequency,  String? category,  ReminderMode reminderMode,  String? cardLastFour,  SubStatus status,  String? note,  DateTime? trialEndDate)?  $default,) {final _that = this;
 switch (_that) {
 case _SubSlice() when $default != null:
-return $default(_that.brand,_that.name,_that.amount,_that.color,_that.startDate,_that.frequency,_that.category);case _:
+return $default(_that.brand,_that.name,_that.amount,_that.color,_that.startDate,_that.frequency,_that.category,_that.reminderMode,_that.cardLastFour,_that.status,_that.note,_that.trialEndDate);case _:
   return null;
 
 }
@@ -227,7 +232,7 @@ return $default(_that.brand,_that.name,_that.amount,_that.color,_that.startDate,
 @JsonSerializable()
 
 class _SubSlice extends SubSlice {
-  const _SubSlice({this.brand, required this.name, required this.amount, required this.color, required this.startDate, this.frequency = Frequency.monthly, this.category}): super._();
+  const _SubSlice({this.brand, required this.name, required this.amount, required this.color, required this.startDate, this.frequency = Frequency.monthly, this.category, this.reminderMode = ReminderMode.both, this.cardLastFour, this.status = SubStatus.active, this.note, this.trialEndDate}): super._();
   factory _SubSlice.fromJson(Map<String, dynamic> json) => _$SubSliceFromJson(json);
 
 @override final  Brand? brand;
@@ -237,6 +242,11 @@ class _SubSlice extends SubSlice {
 @override final  DateTime startDate;
 @override@JsonKey() final  Frequency frequency;
 @override final  String? category;
+@override@JsonKey() final  ReminderMode reminderMode;
+@override final  String? cardLastFour;
+@override@JsonKey() final  SubStatus status;
+@override final  String? note;
+@override final  DateTime? trialEndDate;
 
 /// Create a copy of SubSlice
 /// with the given fields replaced by the non-null parameter values.
@@ -251,16 +261,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SubSlice&&(identical(other.brand, brand) || other.brand == brand)&&(identical(other.name, name) || other.name == name)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.color, color) || other.color == color)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.frequency, frequency) || other.frequency == frequency)&&(identical(other.category, category) || other.category == category));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SubSlice&&(identical(other.brand, brand) || other.brand == brand)&&(identical(other.name, name) || other.name == name)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.color, color) || other.color == color)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.frequency, frequency) || other.frequency == frequency)&&(identical(other.category, category) || other.category == category)&&(identical(other.reminderMode, reminderMode) || other.reminderMode == reminderMode)&&(identical(other.cardLastFour, cardLastFour) || other.cardLastFour == cardLastFour)&&(identical(other.status, status) || other.status == status)&&(identical(other.note, note) || other.note == note)&&(identical(other.trialEndDate, trialEndDate) || other.trialEndDate == trialEndDate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,brand,name,amount,color,startDate,frequency,category);
+int get hashCode => Object.hash(runtimeType,brand,name,amount,color,startDate,frequency,category,reminderMode,cardLastFour,status,note,trialEndDate);
 
 @override
 String toString() {
-  return 'SubSlice(brand: $brand, name: $name, amount: $amount, color: $color, startDate: $startDate, frequency: $frequency, category: $category)';
+  return 'SubSlice(brand: $brand, name: $name, amount: $amount, color: $color, startDate: $startDate, frequency: $frequency, category: $category, reminderMode: $reminderMode, cardLastFour: $cardLastFour, status: $status, note: $note, trialEndDate: $trialEndDate)';
 }
 
 
@@ -271,7 +281,7 @@ abstract mixin class _$SubSliceCopyWith<$Res> implements $SubSliceCopyWith<$Res>
   factory _$SubSliceCopyWith(_SubSlice value, $Res Function(_SubSlice) _then) = __$SubSliceCopyWithImpl;
 @override @useResult
 $Res call({
- Brand? brand, String name, double amount, int color, DateTime startDate, Frequency frequency, String? category
+ Brand? brand, String name, double amount, int color, DateTime startDate, Frequency frequency, String? category, ReminderMode reminderMode, String? cardLastFour, SubStatus status, String? note, DateTime? trialEndDate
 });
 
 
@@ -288,7 +298,7 @@ class __$SubSliceCopyWithImpl<$Res>
 
 /// Create a copy of SubSlice
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? brand = freezed,Object? name = null,Object? amount = null,Object? color = null,Object? startDate = null,Object? frequency = null,Object? category = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? brand = freezed,Object? name = null,Object? amount = null,Object? color = null,Object? startDate = null,Object? frequency = null,Object? category = freezed,Object? reminderMode = null,Object? cardLastFour = freezed,Object? status = null,Object? note = freezed,Object? trialEndDate = freezed,}) {
   return _then(_SubSlice(
 brand: freezed == brand ? _self.brand : brand // ignore: cast_nullable_to_non_nullable
 as Brand?,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -297,7 +307,12 @@ as double,color: null == color ? _self.color : color // ignore: cast_nullable_to
 as int,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
 as DateTime,frequency: null == frequency ? _self.frequency : frequency // ignore: cast_nullable_to_non_nullable
 as Frequency,category: freezed == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,reminderMode: null == reminderMode ? _self.reminderMode : reminderMode // ignore: cast_nullable_to_non_nullable
+as ReminderMode,cardLastFour: freezed == cardLastFour ? _self.cardLastFour : cardLastFour // ignore: cast_nullable_to_non_nullable
+as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as SubStatus,note: freezed == note ? _self.note : note // ignore: cast_nullable_to_non_nullable
+as String?,trialEndDate: freezed == trialEndDate ? _self.trialEndDate : trialEndDate // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 

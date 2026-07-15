@@ -1,4 +1,4 @@
-// ignore_for_file: strict_raw_type, always_specify_types
+// ignore_for_file: strict_raw_type
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -8,10 +8,10 @@ class FadeTransitionPage extends CustomTransitionPage {
     : super(
         transitionsBuilder:
             (
-              BuildContext context,
-              Animation<double> animation,
-              Animation<double> secondaryAnimation,
-              Widget child,
+              context,
+              animation,
+              secondaryAnimation,
+              child,
             ) {
               return FadeTransition(opacity: animation, child: child);
             },
@@ -24,7 +24,7 @@ extension GoRouteExtension on GoRoute {
   GoRoute fade() {
     return GoRoute(
       path: path,
-      pageBuilder: (BuildContext context, GoRouterState state) {
+      pageBuilder: (context, state) {
         return FadeTransitionPage(
           key: ValueKey<String>(path),
           child: builder!(context, state),

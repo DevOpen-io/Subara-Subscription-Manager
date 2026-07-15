@@ -67,7 +67,6 @@ class FloatingSubCard extends HookWidget {
           ],
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
               width: 30,

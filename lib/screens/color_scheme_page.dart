@@ -3,10 +3,10 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:simple_icons/simple_icons.dart';
-import 'package:subs_tracker/providers/settings_controller.dart';
-import 'package:subs_tracker/utils/app_theme.dart';
-import 'package:subs_tracker/widgets/color_scheme_picker.dart';
-import 'package:subs_tracker/widgets/floating_sub_card.dart';
+import '../providers/settings_controller.dart';
+import '../utils/app_theme.dart';
+import '../widgets/color_scheme_picker.dart';
+import '../widgets/floating_sub_card.dart';
 
 class ColorSchemePage extends ConsumerWidget {
   const ColorSchemePage({super.key, this.pageOffset = 0.0});
@@ -48,7 +48,7 @@ class ColorSchemePage extends ConsumerWidget {
                         gradient: RadialGradient(
                           colors: [
                             col.withValues(alpha: 0.30),
-                            col.withValues(alpha: 0.0),
+                            col.withValues(alpha: 0),
                           ],
                         ),
                       ),
@@ -162,7 +162,7 @@ class _SchemeNameChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.28), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.28)),
       ),
       child: Text(
         name,

@@ -5,12 +5,13 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:subs_tracker/providers/settings_controller.dart';
-import 'package:subs_tracker/screens/color_scheme_page.dart';
-import 'package:subs_tracker/widgets/floating_sub_card.dart';
-import 'package:subs_tracker/screens/intro_page.dart';
-import 'package:subs_tracker/widgets/page_dots.dart';
-import 'package:subs_tracker/screens/popular_subs_page.dart';
+
+import '../providers/settings_controller.dart';
+import '../widgets/floating_sub_card.dart';
+import '../widgets/page_dots.dart';
+import 'color_scheme_page.dart';
+import 'intro_page.dart';
+import 'popular_subs_page.dart';
 
 class OnboardingScreen extends HookConsumerWidget {
   const OnboardingScreen({super.key});
@@ -76,8 +77,8 @@ class OnboardingScreen extends HookConsumerWidget {
 
             // Page 2 target: first tile in PopularSubsPage ListView.
             // tile0Left must match ListView's horizontal padding (16px each side).
-            final tile0Left = 16.0;
-            final tile0Top = _popularHeaderH;
+            const tile0Left = 16.0;
+            const tile0Top = _popularHeaderH;
             final tile0W = w - 32;
 
             return AnimatedBuilder(
@@ -101,7 +102,7 @@ class OnboardingScreen extends HookConsumerWidget {
                         Expanded(
                           child: PageView(
                             controller: pageController,
-                            onPageChanged: (int page) =>
+                            onPageChanged: (page) =>
                                 currentPage.value = page,
                             children: [
                               IntroPage(
@@ -192,7 +193,6 @@ class OnboardingScreen extends HookConsumerWidget {
                               t2,
                             )!,
                             logoInitials: 'N',
-                            rotation: 0.0,
                             width: lerpDouble(_card1W, tile0W, t2)!,
                             phaseOffset: lerpDouble(0.3, 0.0, t2)!,
                             amplitude: lerpDouble(1.0, 0.0, t2)!,

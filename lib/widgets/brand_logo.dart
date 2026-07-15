@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:subs_tracker/models/brand.dart';
-import 'package:subs_tracker/utils/brand_utils.dart';
+
+import '../models/brand.dart';
+import '../utils/brand_utils.dart';
 
 class SubLeadingIcon extends StatelessWidget {
   const SubLeadingIcon({

@@ -3,11 +3,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:subs_tracker/models/settings_view_model.dart';
-import 'package:subs_tracker/providers/settings_controller.dart';
-import 'package:subs_tracker/utils/app_theme.dart';
-import 'package:subs_tracker/widgets/color_scheme_picker.dart';
-import 'package:subs_tracker/widgets/sub_zilla_app_bar.dart';
+
+import '../models/settings_view_model.dart';
+import '../providers/settings_controller.dart';
+import '../services/live_activity_service.dart';
+import '../utils/app_theme.dart';
+import '../widgets/color_scheme_picker.dart';
+import '../widgets/sub_zilla_app_bar.dart';
 
 class SettingsScreen extends HookConsumerWidget {
   const SettingsScreen({super.key});
@@ -17,7 +19,7 @@ class SettingsScreen extends HookConsumerWidget {
     final settingsAsync = ref.watch(settingsControllerProvider);
 
     return Scaffold(
-      appBar: SubZillaAppBar(),
+      appBar: const SubZillaAppBar(),
       body: settingsAsync.when(
         data: (settings) => _buildSettings(context, settings, ref),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -32,11 +34,12 @@ class SettingsScreen extends HookConsumerWidget {
     WidgetRef ref,
   ) {
     return SafeArea(
+      bottom: false,
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.paddingOf(context).bottom),
         children: [
           Text(
-            "settings.title",
+            'settings.title',
             style: Theme.of(
               context,
             ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
@@ -44,15 +47,15 @@ class SettingsScreen extends HookConsumerWidget {
           const SizedBox(height: 24),
           // Theme Section
           _SettingsSection(
-            title: "settings.appearance".tr(),
+            title: 'settings.appearance'.tr(),
             children: [
               _SettingsTile(
-                title: "settings.theme".tr(),
+                title: 'settings.theme'.tr(),
                 subtitle: _getThemeLabel(settings.theme).tr(),
                 onTap: () => _showThemeBottomSheet(context, settings, ref),
               ),
               _SettingsTile(
-                title: "settings.color_scheme".tr(),
+                title: 'settings.color_scheme'.tr(),
                 subtitle: schemeDisplayName(settings.colorScheme),
                 onTap: () =>
                     _showColorSchemeBottomSheet(context, settings, ref),
@@ -62,12 +65,12 @@ class SettingsScreen extends HookConsumerWidget {
           const SizedBox(height: 24),
           // Currency Section
           _SettingsSection(
-            title: "settings.currency".tr(),
+            title: 'settings.currency'.tr(),
             children: [
               _SettingsTile(
-                title: "settings.currency_unit".tr(),
+                title: 'settings.currency_unit'.tr(),
                 subtitle:
-                    "${settings.currency.label} (${settings.currency.symbol})",
+                    '${settings.currency.label} (${settings.currency.symbol})',
                 onTap: () => _showCurrencyBottomSheet(context, settings, ref),
               ),
             ],
@@ -75,30 +78,30 @@ class SettingsScreen extends HookConsumerWidget {
           const SizedBox(height: 24),
           // Language Section
           _SettingsSection(
-            title: "settings.language".tr(),
+            title: 'settings.language'.tr(),
             children: [
               _SettingsTile(
-                title: "settings.language".tr(),
+                title: 'settings.language'.tr(),
                 subtitle: context.locale.languageCode == 'en'
                     ? 'English'
                     : 'Türkçe',
-                onTap: () async => await _showLanguageBottomSheet(context),
+                onTap: () => _showLanguageBottomSheet(context),
               ),
             ],
           ),
           const SizedBox(height: 24),
           // About Section
           _SettingsSection(
-            title: "settings.about".tr(),
+            title: 'settings.about'.tr(),
             children: [
               _SettingsTile(
-                title: "settings.version".tr(),
-                subtitle: "1.0.0",
+                title: 'settings.version'.tr(),
+                subtitle: '1.0.0',
                 onTap: null,
               ),
               _SettingsTile(
-                title: "settings.app_name".tr(),
-                subtitle: "SubZilla",
+                title: 'settings.app_name'.tr(),
+                subtitle: 'SubZilla',
                 onTap: null,
               ),
             ],
@@ -106,8 +109,11 @@ class SettingsScreen extends HookConsumerWidget {
           const SizedBox(height: 24),
           if (kDebugMode)
             _SettingsSection(
-              title: "Developer",
-              children: [_ResetOnboardingTile(ref: ref)],
+              title: 'Developer',
+              children: [
+                _ResetOnboardingTile(ref: ref),
+                _TestLiveActivityTile(),
+              ],
             ),
         ],
       ),
@@ -117,11 +123,11 @@ class SettingsScreen extends HookConsumerWidget {
   String _getThemeLabel(ThemeMode mode) {
     switch (mode) {
       case ThemeMode.light:
-        return "settings.light";
+        return 'settings.light';
       case ThemeMode.dark:
-        return "settings.dark";
+        return 'settings.dark';
       case ThemeMode.system:
-        return "settings.system";
+        return 'settings.system';
     }
   }
 
@@ -130,7 +136,7 @@ class SettingsScreen extends HookConsumerWidget {
     SettingsViewModel settings,
     WidgetRef ref,
   ) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       useRootNavigator: true,
       context: context,
       builder: (context) {
@@ -141,7 +147,7 @@ class SettingsScreen extends HookConsumerWidget {
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  "settings.select_theme".tr(),
+                  'settings.select_theme'.tr(),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -172,7 +178,7 @@ class SettingsScreen extends HookConsumerWidget {
     SettingsViewModel settings,
     WidgetRef ref,
   ) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       useRootNavigator: true,
       context: context,
       builder: (context) {
@@ -183,7 +189,7 @@ class SettingsScreen extends HookConsumerWidget {
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  "settings.select_color_scheme".tr(),
+                  'settings.select_color_scheme'.tr(),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -211,7 +217,7 @@ class SettingsScreen extends HookConsumerWidget {
     SettingsViewModel settings,
     WidgetRef ref,
   ) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       useRootNavigator: true,
       context: context,
       builder: (context) {
@@ -222,7 +228,7 @@ class SettingsScreen extends HookConsumerWidget {
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  "settings.select_currency".tr(),
+                  'settings.select_currency'.tr(),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -257,7 +263,7 @@ class SettingsScreen extends HookConsumerWidget {
   }
 
   Future<void> _showLanguageBottomSheet(BuildContext context) async {
-    await showModalBottomSheet(
+    await showModalBottomSheet<void>(
       useRootNavigator: true,
       context: context,
       builder: (context) {
@@ -268,14 +274,14 @@ class SettingsScreen extends HookConsumerWidget {
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  "settings.select_language".tr(),
+                  'settings.select_language'.tr(),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
               LanguageOption(
-                label: "English",
+                label: 'English',
                 isSelected: context.locale.languageCode == 'en',
                 onTap: () {
                   context.setLocale(const Locale('en'));
@@ -283,7 +289,7 @@ class SettingsScreen extends HookConsumerWidget {
                 },
               ),
               LanguageOption(
-                label: "Türkçe",
+                label: 'Türkçe',
                 isSelected: context.locale.languageCode == 'tr',
                 onTap: () {
                   context.setLocale(const Locale('tr'));
@@ -464,10 +470,10 @@ class _ResetOnboardingTile extends StatelessWidget {
               ],
             ),
           );
-          if (confirmed == true && context.mounted) {
+          if ((confirmed ?? false) && context.mounted) {
             ref
                 .read(settingsControllerProvider.notifier)
-                .updateIsFirstTime(true);
+                .updateIsFirstTime(isFirstTime: true);
             context.go('/intro');
           }
         },
@@ -499,6 +505,27 @@ class LanguageOption extends StatelessWidget {
             )
           : const Icon(Icons.radio_button_unchecked),
       onTap: onTap,
+    );
+  }
+}
+
+class _TestLiveActivityTile extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: const Text('Test Live Activity'),
+      subtitle: const Text('Force-starts with dummy Netflix sub'),
+      leading: const Icon(Icons.live_tv),
+      onTap: () async {
+        const subsJson =
+            r'[{"name":"Netflix","amount":15.99,"currency":"$","color":4294901760}]';
+        await LiveActivityService.instance.startRaw(subsJson);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Live Activity started — lock the screen to see it')),
+          );
+        }
+      },
     );
   }
 }

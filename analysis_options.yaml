@@ -7,9 +7,16 @@
 
 # The following line activates a set of recommended lints for Flutter apps,
 # packages, and plugins designed to encourage good coding practices.
-include: package:flutter_lints/flutter.yaml
+include: analysis_options_without_plugins.yaml
+
+plugins:
+  #! DONT REMOVE: its false positive and riverpod lints dont work without it
+  riverpod_lint: ^3.1.4
+
 
 analyzer:
+  errors:
+    public_member_api_docs: ignore
   exclude:
     - '**/*.g.dart'       # Exclude generated files
     - '**/*.freezed.dart' # Exclude freezed files

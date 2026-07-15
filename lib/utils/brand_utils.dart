@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:simple_icons/simple_icons.dart';
-import 'package:subs_tracker/models/brand.dart';
+import '../models/brand.dart';
 
 /// Extension on [Brand] to derive icon data from Simple Icons.
 ///

@@ -3,21 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:subs_tracker/config/router_config.dart';
-import 'package:subs_tracker/models/brand.dart';
-import 'package:subs_tracker/models/settings_view_model.dart';
-import 'package:subs_tracker/models/sub_slice.dart';
-import 'package:subs_tracker/providers/brands_provider.dart';
-import 'package:subs_tracker/providers/settings_controller.dart';
-import 'package:subs_tracker/providers/subs_controller.dart';
-import 'package:subs_tracker/utils/brand_utils.dart';
-import 'package:subs_tracker/widgets/brand_logo.dart';
+import '../config/router_config.dart';
+import '../models/brand.dart';
+import '../models/settings_view_model.dart';
+import '../models/sub_slice.dart';
+import '../providers/brands_provider.dart';
+import '../providers/settings_controller.dart';
+import '../providers/subs_controller.dart';
+import '../utils/brand_utils.dart';
+import '../widgets/brand_logo.dart';
 
 int _colorForBrand(Brand brand) {
   final c = brand.iconColor;
   if (c != null) return c.toARGB32();
   final hash = brand.text.codeUnits.fold(0, (a, b) => (a * 31 + b) & 0xFFFFFFFF);
-  return HSLColor.fromAHSL(1.0, (hash % 360).toDouble(), 0.58, 0.45).toColor().toARGB32();
+  return HSLColor.fromAHSL(1, (hash % 360).toDouble(), 0.58, 0.45).toColor().toARGB32();
 }
 
 class PopularSubsPage extends HookConsumerWidget {
@@ -117,7 +117,6 @@ class PopularSubsPage extends HookConsumerWidget {
                             amount: amount,
                             color: _colorForBrand(brand),
                             startDate: DateTime.now(),
-                            frequency: Frequency.monthly,
                             brand: brand,
                           ),
                         );
@@ -135,7 +134,7 @@ class PopularSubsPage extends HookConsumerWidget {
             onPressed: () {
               ref
                   .read(settingsControllerProvider.notifier)
-                  .updateIsFirstTime(false);
+                  .updateIsFirstTime(isFirstTime: false);
               context.go(Routes.home.route);
             },
             style: FilledButton.styleFrom(
@@ -258,7 +257,6 @@ class _PopularSubTile extends HookWidget {
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
                     color: cs.primary.withValues(alpha: 0.5),
-                    width: 1,
                   ),
                 ),
               ),

@@ -28,7 +28,7 @@ final class SettingsStorageProvider
         argument: null,
         retry: null,
         name: r'settingsStorageProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -48,7 +48,7 @@ final class SettingsStorageProvider
   }
 }
 
-String _$settingsStorageHash() => r'cbb6fe2ab51d09c16684e0bc77b87d31b9442467';
+String _$settingsStorageHash() => r'a3a38c976342a6e31db1075c1f8fad90f4a5eb0a';
 
 @ProviderFor(SettingsController)
 @JsonPersist()
@@ -77,7 +77,7 @@ final class SettingsControllerProvider
 }
 
 String _$settingsControllerHash() =>
-    r'2acc9cf68f82765c13b6e7f5ec92eb535164615f';
+    r'125557f6cd8d5047c503eaff774a4a994d570f92';
 
 @JsonPersist()
 abstract class _$SettingsControllerBase

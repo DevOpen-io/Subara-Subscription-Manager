@@ -1,0 +1,4 @@
+-keep class androidx.glance.** { *; }
+-keep class io.devopen.subzilla.widget.** { *; }
+-keepclassmembers class * extends androidx.glance.appwidget.GlanceAppWidget { *; }
+-keepclassmembers class * extends androidx.glance.appwidget.GlanceAppWidgetReceiver { *; }
