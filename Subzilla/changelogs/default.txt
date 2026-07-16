@@ -1,4 +1,4 @@
-What's new in SubZilla:
+What's new in Subara:
 
 • Track and manage all your subscriptions in one place
 • Visual analytics with interactive spending charts

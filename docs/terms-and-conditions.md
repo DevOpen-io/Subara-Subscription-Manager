@@ -1,15 +1,15 @@
-# Terms & Conditions for SubZilla
+# Terms & Conditions for Subara
 
 Effective date: March 15, 2026
 Last updated: March 15, 2026
 
-These Terms & Conditions ("Terms") govern your use of the SubZilla mobile application ("App") provided by DevOpen ("Service Provider", "we", "us", or "our").
+These Terms & Conditions ("Terms") govern your use of the Subara mobile application ("App") provided by DevOpen ("Service Provider", "we", "us", or "our").
 
 By downloading, accessing, or using the App, you agree to these Terms.
 
 ## 1) Use of the App
 
-SubZilla is provided as an open-source, local-first subscription tracker.
+Subara is provided as an open-source, local-first subscription tracker.
 
 You agree to:
 - Use the App only for lawful purposes
@@ -30,7 +30,7 @@ The App may depend on:
 Your use of the App is also governed by our Privacy Policy:
 - https://github.com/DevOpen-io/Subs-Tracker-App/blob/main/docs/privacy-policy.md
 
-Because SubZilla is local-first, most data is stored on your device, and you are responsible for device-level protection and exported backups.
+Because Subara is local-first, most data is stored on your device, and you are responsible for device-level protection and exported backups.
 
 ## 4) Third-Party Services and Links
 
@@ -40,7 +40,7 @@ We do not control third-party services and are not responsible for their content
 
 ## 5) Open Source and Intellectual Property
 
-SubZilla is distributed as open source under the repository license.
+Subara is distributed as open source under the repository license.
 
 Except where permitted by the applicable open-source license, you may not copy, modify, or redistribute App components in violation of that license.
 

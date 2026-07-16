@@ -1,10 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import '../layout/root_layout.dart';
 
-class SubZillaAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const SubZillaAppBar({this.trailing, super.key});
+class SubaraAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const SubaraAppBar({this.trailing, super.key});
 
   final Widget? trailing;
   @override

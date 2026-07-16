@@ -6,11 +6,11 @@
 
 <a id="english"></a>
 
-# SubZilla
+# Subara
 
-**SubZilla** is a powerful and intuitive Flutter application designed to help you manage your monthly subscriptions, track recurring expenses, and stay in control of your budget.
+**Subara** is a powerful and intuitive Flutter application designed to help you manage your monthly subscriptions, track recurring expenses, and stay in control of your budget.
 
-With recent major updates, SubZilla now offers an even smoother experience with enhanced performance, new features, and a polished design.
+With recent major updates, Subara now offers an even smoother experience with enhanced performance, new features, and a polished design.
 
 <div align="center">
   <h3>🏠 Home Screen</h3>
@@ -73,8 +73,8 @@ Follow these steps to download the source code and set up your development envir
 
 1.  **Clone the Repository**
     ```bash
-    git clone https://github.com/DevOpen-io/SubZilla.git
-    cd SubZilla
+    git clone https://github.com/DevOpen-io/Subara.git
+    cd Subara
     ```
 
 2.  **Install Dependencies**
@@ -105,7 +105,7 @@ Follow these steps to download the source code and set up your development envir
 
 We love contributions! If you have ideas for new features or have found a bug, here is how you can help:
 
--   **Report Issues**: Use the [GitHub Issues](https://github.com/DevOpen-io/SubZilla/issues) tab to report bugs or request features.
+-   **Report Issues**: Use the [GitHub Issues](https://github.com/DevOpen-io/Subara/issues) tab to report bugs or request features.
 -   **Submit Pull Requests**: Fork the repository, make your changes, and submit a PR. Please ensure your code follows the project's style and passes all tests.
 -   **Support**: Give the project a star ⭐ to show your support!
 
@@ -123,11 +123,11 @@ We love contributions! If you have ideas for new features or have found a bug, h
 
 <a id="turkish"></a>
 
-# SubZilla
+# Subara
 
-**SubZilla**, aylık aboneliklerinizi yönetmenize, tekrarlayan harcamalarınızı takip etmenize ve bütçenizi kontrol altında tutmanıza yardımcı olmak için tasarlanmış güçlü ve sezgisel bir Flutter uygulamasıdır.
+**Subara**, aylık aboneliklerinizi yönetmenize, tekrarlayan harcamalarınızı takip etmenize ve bütçenizi kontrol altında tutmanıza yardımcı olmak için tasarlanmış güçlü ve sezgisel bir Flutter uygulamasıdır.
 
-Son büyük güncellemelerle birlikte SubZilla, gelişmiş performans, yeni özellikler ve cilalanmış bir tasarımla çok daha akıcı bir deneyim sunuyor.
+Son büyük güncellemelerle birlikte Subara, gelişmiş performans, yeni özellikler ve cilalanmış bir tasarımla çok daha akıcı bir deneyim sunuyor.
 
 <div align="center">
   <h3>🏠 Ana Ekran</h3>
@@ -190,8 +190,8 @@ Kaynak kodunu indirmek ve geliştirme ortamınızı kurmak için aşağıdaki ad
 
 1.  **Depoyu Klonlayın**
     ```bash
-    git clone https://github.com/DevOpen-io/SubZilla.git
-    cd SubZilla
+    git clone https://github.com/DevOpen-io/Subara.git
+    cd Subara
     ```
 
 2.  **Bağımlılıkları Yükleyin**
@@ -222,7 +222,7 @@ Kaynak kodunu indirmek ve geliştirme ortamınızı kurmak için aşağıdaki ad
 
 Katkıları seviyoruz! Yeni özellikler için fikirleriniz varsa veya bir hata bulduysanız, işte nasıl yardımcı olabileceğiniz:
 
--   **Sorun Bildirin**: Hataları bildirmek veya özellik istemek için [GitHub Issues](https://github.com/DevOpen-io/SubZilla/issues) sekmesini kullanın.
+-   **Sorun Bildirin**: Hataları bildirmek veya özellik istemek için [GitHub Issues](https://github.com/DevOpen-io/Subara/issues) sekmesini kullanın.
 -   **Pull Request Gönderin**: Depoyu fork'layın, değişikliklerinizi yapın ve bir PR gönderin. Lütfen kodunuzun proje stiline uyduğundan ve tüm testleri geçtiğinden emin olun.
 -   **Destek**: Desteğinizi göstermek için projeye bir yıldız ⭐ verin!
 
@@ -240,4 +240,4 @@ Katkıları seviyoruz! Yeni özellikler için fikirleriniz varsa veya bir hata b
 
 ## 📈 Star History / Yıldız Geçmişi
 
-[![Star History Chart](https://api.star-history.com/svg?repos=DevOpen-io/SubZilla&type=Date)](https://star-history.com/#DevOpen-io/SubZilla&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=DevOpen-io/Subara&type=Date)](https://star-history.com/#DevOpen-io/Subara&Date)
