@@ -1,10 +1,10 @@
-# SubZilla
+# Subara
 
 **register:** product
 
 ## Product Name
 
-SubZilla
+Subara
 
 ## Product Purpose
 

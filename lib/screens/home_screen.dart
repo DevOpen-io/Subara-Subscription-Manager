@@ -28,7 +28,7 @@ class HomeScreen extends HookConsumerWidget {
     return Scaffold(
       extendBody: true,
       resizeToAvoidBottomInset: false,
-      appBar: SubZillaAppBar(
+      appBar: SubaraAppBar(
         trailing: IconButton(
           icon: const Icon(Icons.add),
           onPressed: () => showModalBottomSheet<void>(

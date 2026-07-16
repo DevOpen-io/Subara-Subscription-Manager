@@ -1,6 +1,6 @@
-SubZilla, aylık aboneliklerinizi yönetmenize, tekrarlayan harcamalarınızı takip etmenize ve bütçenizi kontrol altında tutmanıza yardımcı olmak için tasarlanmış güçlü ve sezgisel bir Flutter uygulamasıdır.
+Subara, aylık aboneliklerinizi yönetmenize, tekrarlayan harcamalarınızı takip etmenize ve bütçenizi kontrol altında tutmanıza yardımcı olmak için tasarlanmış güçlü ve sezgisel bir Flutter uygulamasıdır.
 
-Son büyük güncellemelerle birlikte SubZilla, gelişmiş performans, yeni özellikler ve cilalanmış bir tasarımla çok daha akıcı bir deneyim sunuyor.
+Son büyük güncellemelerle birlikte Subara, gelişmiş performans, yeni özellikler ve cilalanmış bir tasarımla çok daha akıcı bir deneyim sunuyor.
 
 Özellikler:
 

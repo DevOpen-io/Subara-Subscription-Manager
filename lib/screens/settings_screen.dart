@@ -19,7 +19,7 @@ class SettingsScreen extends HookConsumerWidget {
     final settingsAsync = ref.watch(settingsControllerProvider);
 
     return Scaffold(
-      appBar: const SubZillaAppBar(),
+      appBar: const SubaraAppBar(),
       body: settingsAsync.when(
         data: (settings) => _buildSettings(context, settings, ref),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -101,7 +101,7 @@ class SettingsScreen extends HookConsumerWidget {
               ),
               _SettingsTile(
                 title: 'settings.app_name'.tr(),
-                subtitle: 'SubZilla',
+                subtitle: 'Subara',
                 onTap: null,
               ),
             ],

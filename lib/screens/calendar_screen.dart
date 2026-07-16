@@ -49,7 +49,7 @@ class CalendarScreen extends HookConsumerWidget {
     }
 
     return Scaffold(
-      appBar: const SubZillaAppBar(),
+      appBar: const SubaraAppBar(),
       body: subsAsync.when(
         data: (subs) {
           final selectedEvents = selectedDay.value == null

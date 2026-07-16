@@ -1,11 +1,11 @@
-# Privacy Policy for SubZilla
+# Privacy Policy for Subara
 
 Effective date: March 15, 2026
 Last updated: March 15, 2026
 
-This Privacy Policy explains how SubZilla ("the App") processes information when you use the app.
+This Privacy Policy explains how Subara ("the App") processes information when you use the app.
 
-SubZilla is designed as a local-first subscription tracker. Most data is stored only on your device.
+Subara is designed as a local-first subscription tracker. Most data is stored only on your device.
 
 ## 1) Data Controller and Contact
 
@@ -115,7 +115,7 @@ You may request to know, delete, or correct personal information (as applicable)
 
 ## 11) Children’s Privacy
 
-SubZilla is not directed to children under 13 (or higher age where required by local law). If you believe a child has provided personal information, contact us so we can address it.
+Subara is not directed to children under 13 (or higher age where required by local law). If you believe a child has provided personal information, contact us so we can address it.
 
 ## 12) Permissions Used by the App
 

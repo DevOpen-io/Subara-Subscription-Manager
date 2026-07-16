@@ -47,7 +47,7 @@ class AnalyticsScreen extends HookConsumerWidget {
     final chartMode = useState(_ChartMode.price);
 
     return Scaffold(
-      appBar: const SubZillaAppBar(),
+      appBar: const SubaraAppBar(),
       body: slicesAsync.when(
         data: (slices) => settingsAsync.when(
           data: (settings) => _buildBody(slices, settings, context, period, chartMode),

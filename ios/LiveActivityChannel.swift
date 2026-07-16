@@ -37,7 +37,7 @@ class LiveActivityChannel {
               let subs = try? JSONDecoder().decode([DueSub].self, from: data) else { return }
         guard let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date()) else { return }
         let staleDate = Calendar.current.startOfDay(for: tomorrow)
-        let attributes = SubsDueAttributes(appName: "SubZilla")
+        let attributes = SubsDueAttributes(appName: "Subara")
         let state = SubsDueAttributes.ContentState(dueSubs: subs)
         let content = ActivityContent(state: state, staleDate: staleDate)
         do {
