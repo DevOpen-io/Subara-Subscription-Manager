@@ -39,7 +39,7 @@ dependencies:
   motor: ^1.1.0
   package_info_plus: ^10.1.0
   path: ^1.9.1
-  path_provider: ^2.1.5
+  path_provider: ^2.1.6
   riverpod_annotation: ^4.0.2
   riverpod_sqflite: ^0.4.2
   share_plus: ^13.1.0
