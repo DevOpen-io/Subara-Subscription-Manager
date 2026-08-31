@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+* **Build:** Bump Android `targetSdk` from 35 to 36 (Android 16).
+* **Fix:** Fix subscription import silently failing on iPhone due to disposed widget state after drawer close.
+
 ## [1.0.0+73] - 2026-03-11
 
 * **Build:** Bump Flutter to 3.41.4.
