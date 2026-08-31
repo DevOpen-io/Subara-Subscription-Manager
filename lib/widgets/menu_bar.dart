@@ -96,6 +96,8 @@ class _MenubarState extends ConsumerState<SidebarMenu> {
   }
 
   Future<void> _importSubscriptions() async {
+    final controller = ref.read(subsControllerProvider.notifier);
+    final messenger = ScaffoldMessenger.of(context);
     try {
       const jsonType = XTypeGroup(
         label: 'JSON',
@@ -107,32 +109,26 @@ class _MenubarState extends ConsumerState<SidebarMenu> {
 
       if (picked != null) {
         final jsonString = await picked.readAsString();
-
-        final controller = ref.read(subsControllerProvider.notifier);
         final success = await controller.importFromJson(jsonString);
 
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                success
-                    ? 'menu.import_success'.tr()
-                    : 'menu.import_error'.tr(),
-              ),
-              backgroundColor: success ? Colors.green : Colors.red,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        messenger.showSnackBar(
           SnackBar(
-            content: Text('menu.import_error'.tr()),
-            backgroundColor: Colors.red,
+            content: Text(
+              success
+                  ? 'menu.import_success'.tr()
+                  : 'menu.import_error'.tr(),
+            ),
+            backgroundColor: success ? Colors.green : Colors.red,
           ),
         );
       }
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('menu.import_error'.tr()),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 

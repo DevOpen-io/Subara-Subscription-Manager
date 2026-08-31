@@ -23,6 +23,8 @@ analyzer:
     - 'build/**'         # Exclude the build directory
     - 'lib/generated/**' # Exclude any custom generated code folders
     - 'packages/**/' # Exclude test files in packages
+    - android/**
+    - ios/**
 
 linter:
   # The lint rules applied to this project can be customized in the
