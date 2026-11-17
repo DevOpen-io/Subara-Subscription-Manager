@@ -19,7 +19,7 @@ dependencies:
   easy_localization: ^3.0.8
   file_selector: ^1.1.0
   fl_chart: ^1.2.0
-  flex_color_scheme: ^8.4.0
+  flex_color_scheme: ^9.0.0
   flutter:
     sdk: flutter
   flutter_colorpicker: ^1.1.0
