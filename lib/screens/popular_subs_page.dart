@@ -16,8 +16,16 @@ import '../widgets/brand_logo.dart';
 int _colorForBrand(Brand brand) {
   final c = brand.iconColor;
   if (c != null) return c.toARGB32();
-  final hash = brand.text.codeUnits.fold(0, (a, b) => (a * 31 + b) & 0xFFFFFFFF);
-  return HSLColor.fromAHSL(1, (hash % 360).toDouble(), 0.58, 0.45).toColor().toARGB32();
+  final hash = brand.text.codeUnits.fold(
+    0,
+    (a, b) => (a * 31 + b) & 0xFFFFFFFF,
+  );
+  return HSLColor.fromAHSL(
+    1,
+    (hash % 360).toDouble(),
+    0.58,
+    0.45,
+  ).toColor().toARGB32();
 }
 
 class PopularSubsPage extends HookConsumerWidget {
@@ -111,15 +119,17 @@ class PopularSubsPage extends HookConsumerWidget {
                       currencySymbol: currency.symbol,
                       onAdd: (amount) {
                         if (isAdded) return;
-                        ref.read(subsControllerProvider.notifier).addSlice(
-                          SubSlice(
-                            name: brand.text,
-                            amount: amount,
-                            color: _colorForBrand(brand),
-                            startDate: DateTime.now(),
-                            brand: brand,
-                          ),
-                        );
+                        ref
+                            .read(subsControllerProvider.notifier)
+                            .addSlice(
+                              SubSlice(
+                                name: brand.text,
+                                amount: amount,
+                                color: _colorForBrand(brand),
+                                startDate: DateTime.now(),
+                                brand: brand,
+                              ),
+                            );
                       },
                     ),
                   );
@@ -228,8 +238,9 @@ class _PopularSubTile extends HookWidget {
             width: 72,
             child: TextField(
               controller: amountCtrl,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               textAlign: TextAlign.end,
               enabled: !isAdded,
               style: TextStyle(
@@ -275,8 +286,8 @@ class _PopularSubTile extends HookWidget {
                   color: isAdded
                       ? const Color(0xFF22C55E).withValues(alpha: 0.14)
                       : hasAmount
-                          ? cs.primary.withValues(alpha: 0.10)
-                          : cs.onSurface.withValues(alpha: 0.05),
+                      ? cs.primary.withValues(alpha: 0.10)
+                      : cs.onSurface.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -285,8 +296,8 @@ class _PopularSubTile extends HookWidget {
                   color: isAdded
                       ? const Color(0xFF22C55E)
                       : hasAmount
-                          ? cs.primary
-                          : cs.onSurface.withValues(alpha: 0.25),
+                      ? cs.primary
+                      : cs.onSurface.withValues(alpha: 0.25),
                 ),
               ),
             ),

@@ -6,15 +6,9 @@ import 'package:go_router/go_router.dart';
 class FadeTransitionPage extends CustomTransitionPage {
   FadeTransitionPage({required LocalKey super.key, required super.child})
     : super(
-        transitionsBuilder:
-            (
-              context,
-              animation,
-              secondaryAnimation,
-              child,
-            ) {
-              return FadeTransition(opacity: animation, child: child);
-            },
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
       );
 }
 

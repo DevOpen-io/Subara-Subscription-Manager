@@ -25,9 +25,9 @@ class StatusBadge extends StatelessWidget {
       child: Text(
         'detail.status_${status.name}'.tr(),
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: statusColor(status),
-              fontWeight: FontWeight.w600,
-            ),
+          color: statusColor(status),
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -61,7 +61,9 @@ void showStatusPicker(
             padding: const EdgeInsets.all(16),
             child: Text(
               'detail.status'.tr(),
-              style: Theme.of(ctx).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(
+                ctx,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
           ),
           ...SubStatus.values.map(

@@ -23,8 +23,10 @@ void main() {
               locale: context.locale,
               home: Builder(
                 builder: (innerContext) => Text(
-                  DateFormat('MMM d, y', innerContext.locale.toString())
-                      .format(DateTime(2026, 6, 15)),
+                  DateFormat(
+                    'MMM d, y',
+                    innerContext.locale.toString(),
+                  ).format(DateTime(2026, 6, 15)),
                 ),
               ),
             ),

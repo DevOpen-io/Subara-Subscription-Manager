@@ -10,10 +10,14 @@ class IntroPage extends HookWidget {
   const IntroPage({
     super.key,
     required this.onGetStarted,
+    required this.onRestore,
     this.pageOffset = 0.0,
   });
 
   final VoidCallback onGetStarted;
+
+  /// "Already a user? Restore from backup".
+  final VoidCallback onRestore;
   final double pageOffset;
 
   @override
@@ -42,6 +46,7 @@ class IntroPage extends HookWidget {
           lerpDouble(c.dy, t.dy, 0.10)!,
         );
       }
+
       lerpController.addListener(onTick);
       return () => lerpController.removeListener(onTick);
     }, [lerpController]);
@@ -246,11 +251,7 @@ class IntroPage extends HookWidget {
           padding: const EdgeInsets.only(top: 8, bottom: 20),
           child: Center(
             child: GestureDetector(
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Restore from backup — coming soon')),
-                );
-              },
+              onTap: onRestore,
               child: Text.rich(
                 TextSpan(
                   style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),

@@ -84,7 +84,9 @@ class ProfilePage extends HookConsumerWidget {
                 ),
                 keyboardType: TextInputType.emailAddress,
                 onChanged: (value) {
-                  ref.read(settingsControllerProvider.notifier).updateUserEmail(value);
+                  ref
+                      .read(settingsControllerProvider.notifier)
+                      .updateUserEmail(value);
                 },
               ),
             ),

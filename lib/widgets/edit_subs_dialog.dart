@@ -11,14 +11,9 @@ import '../utils/color_palette.dart';
 import 'brand_logo.dart';
 
 class EditSubsDialog extends HookConsumerWidget {
-  const EditSubsDialog({
-    required this.slice,
-    required this.index,
-    super.key,
-  });
+  const EditSubsDialog({required this.slice, super.key});
 
   final SubSlice slice;
-  final int index;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -76,13 +71,14 @@ class EditSubsDialog extends HookConsumerWidget {
     void onSave() {
       if (formKey.currentState?.validate() ?? false) {
         final amount = double.parse(amountCtrl.text.replaceAll(',', '.'));
-        ref.read(subsControllerProvider.notifier).updateAt(
-          index,
-          draftSlice.value.copyWith(
-            name: nameCtrl.text.trim(),
-            amount: amount,
-          ),
-        );
+        ref
+            .read(subsControllerProvider.notifier)
+            .updateSlice(
+              draftSlice.value.copyWith(
+                name: nameCtrl.text.trim(),
+                amount: amount,
+              ),
+            );
         Navigator.pop(context);
       }
     }
@@ -162,8 +158,7 @@ class EditSubsDialog extends HookConsumerWidget {
                         }
                         final query = textEditingValue.text.toLowerCase();
                         return allBrands.where(
-                          (option) =>
-                              option.text.toLowerCase().contains(query),
+                          (option) => option.text.toLowerCase().contains(query),
                         );
                       },
                       onSelected: (selection) {
@@ -178,55 +173,57 @@ class EditSubsDialog extends HookConsumerWidget {
                           ),
                         );
                       },
-                      fieldViewBuilder: (
-                        context,
-                        textEditingController,
-                        focusNode,
-                        onFieldSubmitted,
-                      ) {
-                        return TextFormField(
-                          controller: textEditingController,
-                          focusNode: focusNode,
-                          decoration: InputDecoration(
-                            labelText: 'dialogs.brand_label'.tr(),
-                            isDense: true,
-                            prefixIcon: draftSlice.value.brand != null
-                                ? Padding(
-                                    padding: const EdgeInsets.all(8),
-                                    child: BrandLogo(
-                                      brand: draftSlice.value.brand,
-                                    ),
-                                  )
-                                : const Icon(Icons.search),
-                            suffixIcon: draftSlice.value.brand != null
-                                ? Tooltip(
-                                    message: 'dialogs.selected_tooltip'.tr(
-                                      args: [draftSlice.value.brand!.text],
-                                    ),
-                                    child: Icon(
-                                      Icons.check_circle,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                  )
-                                : null,
-                          ),
-                          validator: (value) =>
-                              (value == null || value.trim().isEmpty)
-                              ? 'dialogs.required'.tr()
-                              : null,
-                          textInputAction: TextInputAction.search,
-                          onChanged: (value) {
-                            if (draftSlice.value.brand != null &&
-                                draftSlice.value.brand!.text != value) {
-                              draftSlice.value = draftSlice.value.copyWith(
-                                brand: null,
-                              );
-                            }
+                      fieldViewBuilder:
+                          (
+                            context,
+                            textEditingController,
+                            focusNode,
+                            onFieldSubmitted,
+                          ) {
+                            return TextFormField(
+                              controller: textEditingController,
+                              focusNode: focusNode,
+                              decoration: InputDecoration(
+                                labelText: 'dialogs.brand_label'.tr(),
+                                isDense: true,
+                                prefixIcon: draftSlice.value.brand != null
+                                    ? Padding(
+                                        padding: const EdgeInsets.all(8),
+                                        child: BrandLogo(
+                                          brand: draftSlice.value.brand,
+                                        ),
+                                      )
+                                    : const Icon(Icons.search),
+                                suffixIcon: draftSlice.value.brand != null
+                                    ? Tooltip(
+                                        message: 'dialogs.selected_tooltip'.tr(
+                                          args: [draftSlice.value.brand!.text],
+                                        ),
+                                        child: Icon(
+                                          Icons.check_circle,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.primary,
+                                        ),
+                                      )
+                                    : null,
+                              ),
+                              validator: (value) =>
+                                  (value == null || value.trim().isEmpty)
+                                  ? 'dialogs.required'.tr()
+                                  : null,
+                              textInputAction: TextInputAction.search,
+                              onChanged: (value) {
+                                if (draftSlice.value.brand != null &&
+                                    draftSlice.value.brand!.text != value) {
+                                  draftSlice.value = draftSlice.value.copyWith(
+                                    brand: null,
+                                  );
+                                }
+                              },
+                              onFieldSubmitted: (_) => onFieldSubmitted(),
+                            );
                           },
-                          onFieldSubmitted: (_) => onFieldSubmitted(),
-                        );
-                      },
                       optionsViewBuilder: (context, onSelected, options) {
                         return Align(
                           alignment: Alignment.topLeft,
@@ -245,10 +242,7 @@ class EditSubsDialog extends HookConsumerWidget {
                                 itemBuilder: (context, index) {
                                   final option = options.elementAt(index);
                                   return ListTile(
-                                    leading: BrandLogo(
-                                      brand: option,
-                                      size: 40,
-                                    ),
+                                    leading: BrandLogo(brand: option, size: 40),
                                     title: Text(option.text),
                                     subtitle:
                                         option.category != null ||
@@ -311,8 +305,9 @@ class EditSubsDialog extends HookConsumerWidget {
                       },
                       contentPadding: EdgeInsets.zero,
                       leading: CircleAvatar(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.primaryContainer,
+                        backgroundColor: Theme.of(
+                          context,
+                        ).colorScheme.primaryContainer,
                         child: const Icon(Icons.event, size: 20),
                       ),
                       title: Text('dialogs.start_date'.tr()),
@@ -336,9 +331,7 @@ class EditSubsDialog extends HookConsumerWidget {
                       items: Frequency.values.map((f) {
                         return DropdownMenuItem(
                           value: f,
-                          child: Text(
-                            'frequency.${f.name}'.tr(),
-                          ),
+                          child: Text('frequency.${f.name}'.tr()),
                         );
                       }).toList(),
                       onChanged: (v) {
@@ -357,7 +350,8 @@ class EditSubsDialog extends HookConsumerWidget {
                       spacing: 10,
                       runSpacing: 10,
                       children: kSliceColors.map((c) {
-                        final isSelected = c.toARGB32() == draftSlice.value.color;
+                        final isSelected =
+                            c.toARGB32() == draftSlice.value.color;
                         return GestureDetector(
                           onTap: () => draftSlice.value = draftSlice.value
                               .copyWith(color: c.toARGB32()),
@@ -378,9 +372,7 @@ class EditSubsDialog extends HookConsumerWidget {
                               boxShadow: [
                                 if (isSelected)
                                   BoxShadow(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .primary
+                                    color: Theme.of(context).colorScheme.primary
                                         .withValues(alpha: 0.25),
                                     blurRadius: 12,
                                     offset: const Offset(0, 4),

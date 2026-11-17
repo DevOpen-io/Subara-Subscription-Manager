@@ -14,38 +14,39 @@ object NextDueDateHelper {
         try { LocalDate.parse(isoString.take(10)) } catch (e2: Exception) { null }
     }
 
-    fun nextDueDate(startDate: LocalDate, frequency: String, today: LocalDate = LocalDate.now()): LocalDate {
-        if (startDate.isAfter(today)) return startDate
-        var candidate = when (frequency) {
-            "daily" -> {
-                val days = ChronoUnit.DAYS.between(startDate, today) + 1
-                startDate.plusDays(days)
-            }
-            "weekly" -> {
-                val weeks = ChronoUnit.WEEKS.between(startDate, today) + 1
-                startDate.plusWeeks(weeks)
-            }
-            "monthly" -> {
-                val months = ChronoUnit.MONTHS.between(startDate, today) + 1
-                startDate.plusMonths(months)
-            }
-            "yearly" -> {
-                val years = ChronoUnit.YEARS.between(startDate, today) + 1
-                startDate.plusYears(years)
-            }
-            else -> startDate.plusMonths(1)
+    /**
+     * k-th charge date, always derived from the start date so month-end
+     * anchors don't drift (Jan 31 -> Feb 28 -> Mar 31). Must match
+     * lib/models/billing.dart.
+     */
+    fun occurrence(startDate: LocalDate, frequency: String, k: Long, interval: Int = 1): LocalDate {
+        val n = k * maxOf(1, interval)
+        return when (frequency) {
+            "daily" -> startDate.plusDays(n)
+            "weekly" -> startDate.plusWeeks(n)
+            "yearly" -> startDate.plusYears(n)
+            else -> startDate.plusMonths(n)
         }
-        // Guard: if still <= today (edge case with month-end clamping), advance one more period
-        if (!candidate.isAfter(today)) {
-            candidate = when (frequency) {
-                "daily" -> candidate.plusDays(1)
-                "weekly" -> candidate.plusWeeks(1)
-                "monthly" -> candidate.plusMonths(1)
-                "yearly" -> candidate.plusYears(1)
-                else -> candidate.plusMonths(1)
-            }
+    }
+
+    /** First charge on or after [today]; a charge due today is "next". */
+    fun nextDueDate(
+        startDate: LocalDate,
+        frequency: String,
+        today: LocalDate = LocalDate.now(),
+        interval: Int = 1,
+    ): LocalDate {
+        if (!startDate.isBefore(today)) return startDate
+        val unit = when (frequency) {
+            "daily" -> ChronoUnit.DAYS
+            "weekly" -> ChronoUnit.WEEKS
+            "yearly" -> ChronoUnit.YEARS
+            else -> ChronoUnit.MONTHS
         }
-        return candidate
+        // Estimate from below in charges, then step forward.
+        var k = maxOf(0L, (unit.between(startDate, today) - 1) / maxOf(1, interval))
+        while (occurrence(startDate, frequency, k, interval).isBefore(today)) k++
+        return occurrence(startDate, frequency, k, interval)
     }
 
     fun daysUntil(date: LocalDate, today: LocalDate = LocalDate.now()): Long =

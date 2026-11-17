@@ -4,12 +4,16 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../models/brand.dart';
+import '../models/money.dart';
+import '../models/settings_view_model.dart';
 import '../models/sub_slice.dart';
 import '../providers/brands_provider.dart';
 import '../providers/settings_controller.dart';
 import '../providers/subs_controller.dart';
+import '../utils/billing_labels.dart';
 import '../utils/color_palette.dart';
 import 'brand_logo.dart';
+import 'exchange_rate_dialog.dart';
 import 'status_picker.dart';
 
 const _kPopularBrandNames = [
@@ -44,11 +48,16 @@ class AddSubsSheet extends HookConsumerWidget {
     );
 
     final settingsAsync = ref.watch(settingsControllerProvider);
-    final currencySymbol =
-        settingsAsync.asData?.value.currency.symbol ?? r'$';
+    final settings = settingsAsync.asData?.value;
+    final currencySymbol = settings == null
+        ? r'$'
+        : settings.currencyOf(draftSlice.value).symbol;
 
     void selectBrand(Brand brand) {
-      draftSlice.value = draftSlice.value.copyWith(brand: brand, name: brand.text);
+      draftSlice.value = draftSlice.value.copyWith(
+        brand: brand,
+        name: brand.text,
+      );
       nameCtrl.text = brand.text;
       searchCtrl.value = TextEditingValue(
         text: brand.text,
@@ -101,28 +110,27 @@ class AddSubsSheet extends HookConsumerWidget {
     }
 
     Widget buildSheetContent(List<Brand> allBrands) {
-      final popularBrands = allBrands
-          .where((b) => _kPopularBrandNames.contains(b.text))
-          .toList()
-        ..sort(
-          (a, b) =>
-              _kPopularBrandNames.indexOf(a.text) -
-              _kPopularBrandNames.indexOf(b.text),
-        );
+      final popularBrands =
+          allBrands.where((b) => _kPopularBrandNames.contains(b.text)).toList()
+            ..sort(
+              (a, b) =>
+                  _kPopularBrandNames.indexOf(a.text) -
+                  _kPopularBrandNames.indexOf(b.text),
+            );
 
       void submit() {
         if (formKey.currentState!.validate()) {
-          final amount = double.parse(
-            amountCtrl.text.replaceAll(',', '.'),
-          );
+          final amount = double.parse(amountCtrl.text.replaceAll(',', '.'));
           final note = noteCtrl.text.trim();
-          ref.read(subsControllerProvider.notifier).addSlice(
-            draftSlice.value.copyWith(
-              name: nameCtrl.text.trim(),
-              amount: amount,
-              note: note.isEmpty ? null : note,
-            ),
-          );
+          ref
+              .read(subsControllerProvider.notifier)
+              .addSlice(
+                draftSlice.value.copyWith(
+                  name: nameCtrl.text.trim(),
+                  amount: amount,
+                  note: note.isEmpty ? null : note,
+                ),
+              );
           Navigator.pop(context);
         }
       }
@@ -132,8 +140,9 @@ class AddSubsSheet extends HookConsumerWidget {
         fontWeight: FontWeight.w500,
       );
 
-      final dividerColor =
-          theme.colorScheme.outlineVariant.withValues(alpha: 0.6);
+      final dividerColor = theme.colorScheme.outlineVariant.withValues(
+        alpha: 0.6,
+      );
 
       return ConstrainedBox(
         constraints: BoxConstraints(
@@ -220,67 +229,67 @@ class AddSubsSheet extends HookConsumerWidget {
                           );
                         },
                         onSelected: selectBrand,
-                        fieldViewBuilder: (
-                          context,
-                          textEditingController,
-                          focusNode,
-                          onFieldSubmitted,
-                        ) {
-                          return TextField(
-                            controller: textEditingController,
-                            focusNode: focusNode,
-                            decoration: InputDecoration(
-                              hintText: 'dialogs.search_placeholder'.tr(
-                                args: ['${allBrands.length}'],
-                              ),
-                              isDense: true,
-                              filled: true,
-                              fillColor:
-                                  theme.colorScheme.surfaceContainerHigh,
-                              prefixIcon: draftSlice.value.brand != null
-                                  ? Padding(
-                                      padding: const EdgeInsets.all(8),
-                                      child: BrandLogo(
-                                        brand: draftSlice.value.brand,
-                                        size: 30,
-                                      ),
-                                    )
-                                  : const Icon(Icons.search_rounded),
-                              suffixIcon: draftSlice.value.brand != null
-                                  ? Icon(
-                                      Icons.check_circle_rounded,
-                                      color: theme.colorScheme.primary,
-                                    )
-                                  : null,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: theme.colorScheme.primary
-                                      .withValues(alpha: 0.5),
-                                  width: 1.5,
+                        fieldViewBuilder:
+                            (
+                              context,
+                              textEditingController,
+                              focusNode,
+                              onFieldSubmitted,
+                            ) {
+                              return TextField(
+                                controller: textEditingController,
+                                focusNode: focusNode,
+                                decoration: InputDecoration(
+                                  hintText: 'dialogs.search_placeholder'.tr(
+                                    args: ['${allBrands.length}'],
+                                  ),
+                                  isDense: true,
+                                  filled: true,
+                                  fillColor:
+                                      theme.colorScheme.surfaceContainerHigh,
+                                  prefixIcon: draftSlice.value.brand != null
+                                      ? Padding(
+                                          padding: const EdgeInsets.all(8),
+                                          child: BrandLogo(
+                                            brand: draftSlice.value.brand,
+                                            size: 30,
+                                          ),
+                                        )
+                                      : const Icon(Icons.search_rounded),
+                                  suffixIcon: draftSlice.value.brand != null
+                                      ? Icon(
+                                          Icons.check_circle_rounded,
+                                          color: theme.colorScheme.primary,
+                                        )
+                                      : null,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: theme.colorScheme.primary
+                                          .withValues(alpha: 0.5),
+                                      width: 1.5,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            textInputAction: TextInputAction.search,
-                            onChanged: (value) {
-                              if (draftSlice.value.brand != null &&
-                                  draftSlice.value.brand!.text != value) {
-                                draftSlice.value = draftSlice.value.copyWith(
-                                  brand: null,
-                                );
-                              }
+                                textInputAction: TextInputAction.search,
+                                onChanged: (value) {
+                                  if (draftSlice.value.brand != null &&
+                                      draftSlice.value.brand!.text != value) {
+                                    draftSlice.value = draftSlice.value
+                                        .copyWith(brand: null);
+                                  }
+                                },
+                                onSubmitted: (_) => onFieldSubmitted(),
+                              );
                             },
-                            onSubmitted: (_) => onFieldSubmitted(),
-                          );
-                        },
                         optionsViewBuilder: (context, onSelected, options) {
                           return Align(
                             alignment: Alignment.topLeft,
@@ -364,8 +373,7 @@ class AddSubsSheet extends HookConsumerWidget {
                         children: [
                           const Expanded(child: Divider()),
                           Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
                             child: Text(
                               'dialogs.or_enter_manually'.tr(),
                               style: theme.textTheme.labelSmall?.copyWith(
@@ -409,15 +417,14 @@ class AddSubsSheet extends HookConsumerWidget {
                                         decoration: const InputDecoration(
                                           border: InputBorder.none,
                                           isDense: true,
-                                          contentPadding:
-                                              EdgeInsets.symmetric(
+                                          contentPadding: EdgeInsets.symmetric(
                                             vertical: 12,
                                           ),
                                         ),
                                         style: theme.textTheme.bodyMedium,
                                         validator: (value) =>
                                             (value == null ||
-                                                    value.trim().isEmpty)
+                                                value.trim().isEmpty)
                                             ? 'dialogs.required'.tr()
                                             : null,
                                       ),
@@ -450,18 +457,63 @@ class AddSubsSheet extends HookConsumerWidget {
                                         controller: amountCtrl,
                                         keyboardType:
                                             const TextInputType.numberWithOptions(
-                                          decimal: true,
-                                        ),
+                                              decimal: true,
+                                            ),
                                         decoration: InputDecoration(
                                           border: InputBorder.none,
                                           isDense: true,
                                           contentPadding:
                                               const EdgeInsets.symmetric(
-                                            vertical: 12,
-                                          ),
+                                                vertical: 12,
+                                              ),
                                           prefixText: currencySymbol,
                                           prefixStyle:
                                               theme.textTheme.bodyMedium,
+                                          suffixIcon: settings == null
+                                              ? null
+                                              : _CurrencyDropdown(
+                                                  value: settings.currencyOf(
+                                                    draftSlice.value,
+                                                  ),
+                                                  onChanged: (c) async {
+                                                    // Same as main = follow main.
+                                                    final picked =
+                                                        c == settings.currency
+                                                        ? null
+                                                        : c;
+                                                    draftSlice.value =
+                                                        draftSlice.value
+                                                            .copyWith(
+                                                              currency: picked,
+                                                            );
+                                                    if (picked == null ||
+                                                        settings.hasRate(
+                                                          picked,
+                                                        )) {
+                                                      return;
+                                                    }
+                                                    final edit =
+                                                        await showExchangeRateDialog(
+                                                          context,
+                                                          from: picked,
+                                                          main:
+                                                              settings.currency,
+                                                        );
+                                                    if (edit is RateSet) {
+                                                      ref
+                                                          .read(
+                                                            settingsControllerProvider
+                                                                .notifier,
+                                                          )
+                                                          .setExchangeRate(
+                                                            picked,
+                                                            edit.rate,
+                                                          );
+                                                    }
+                                                  },
+                                                ),
+                                          suffixIconConstraints:
+                                              const BoxConstraints(),
                                         ),
                                         style: theme.textTheme.bodyMedium,
                                         validator: (v) {
@@ -504,10 +556,8 @@ class AddSubsSheet extends HookConsumerWidget {
                                         showSelectedIcon: false,
                                         style: SegmentedButton.styleFrom(
                                           padding: EdgeInsets.zero,
-                                          visualDensity:
-                                              VisualDensity.compact,
-                                          textStyle:
-                                              theme.textTheme.labelSmall,
+                                          visualDensity: VisualDensity.compact,
+                                          textStyle: theme.textTheme.labelSmall,
                                         ),
                                         segments: Frequency.values.map((f) {
                                           return ButtonSegment<Frequency>(
@@ -517,14 +567,43 @@ class AddSubsSheet extends HookConsumerWidget {
                                             ),
                                           );
                                         }).toList(),
-                                        selected: {
-                                          draftSlice.value.frequency,
-                                        },
+                                        selected: {draftSlice.value.frequency},
                                         onSelectionChanged: (s) {
-                                          draftSlice.value =
-                                              draftSlice.value.copyWith(
-                                            frequency: s.first,
-                                          );
+                                          draftSlice.value = draftSlice.value
+                                              .copyWith(frequency: s.first);
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Divider(
+                                height: 0,
+                                indent: 16,
+                                color: dividerColor,
+                              ),
+                              // Repeat every N periods
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 4,
+                                ),
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 90,
+                                      child: Text(
+                                        'dialogs.repeat_label'.tr(),
+                                        style: labelStyle,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: _IntervalDropdown(
+                                        frequency: draftSlice.value.frequency,
+                                        interval: draftSlice.value.period,
+                                        onChanged: (n) {
+                                          draftSlice.value = draftSlice.value
+                                              .copyWith(interval: n);
                                         },
                                       ),
                                     ),
@@ -546,10 +625,8 @@ class AddSubsSheet extends HookConsumerWidget {
                                     lastDate: DateTime(2100),
                                   );
                                   if (pickedDate != null) {
-                                    draftSlice.value =
-                                        draftSlice.value.copyWith(
-                                      startDate: pickedDate,
-                                    );
+                                    draftSlice.value = draftSlice.value
+                                        .copyWith(startDate: pickedDate);
                                   }
                                 },
                                 child: Padding(
@@ -571,7 +648,10 @@ class AddSubsSheet extends HookConsumerWidget {
                                           DateFormat(
                                             'MMM d, y',
                                             context.locale.toString(),
-                                          ).format(draftSlice.value.startDate.toLocal()),
+                                          ).format(
+                                            draftSlice.value.startDate
+                                                .toLocal(),
+                                          ),
                                           style: theme.textTheme.bodyMedium,
                                         ),
                                       ),
@@ -595,10 +675,9 @@ class AddSubsSheet extends HookConsumerWidget {
                                 onTap: () => showStatusPicker(
                                   context,
                                   draftSlice.value.status,
-                                  (status) => draftSlice.value =
-                                      draftSlice.value.copyWith(
-                                    status: status,
-                                  ),
+                                  (status) => draftSlice.value = draftSlice
+                                      .value
+                                      .copyWith(status: status),
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -645,15 +724,13 @@ class AddSubsSheet extends HookConsumerWidget {
                                       context: context,
                                       initialDate:
                                           draftSlice.value.trialEndDate ??
-                                              DateTime.now(),
+                                          DateTime.now(),
                                       firstDate: DateTime(2020),
                                       lastDate: DateTime(2100),
                                     );
                                     if (pickedDate != null) {
-                                      draftSlice.value =
-                                          draftSlice.value.copyWith(
-                                        trialEndDate: pickedDate,
-                                      );
+                                      draftSlice.value = draftSlice.value
+                                          .copyWith(trialEndDate: pickedDate);
                                     }
                                   },
                                   child: Padding(
@@ -677,9 +754,12 @@ class AddSubsSheet extends HookConsumerWidget {
                                                 ? DateFormat(
                                                     'MMM d, y',
                                                     context.locale.toString(),
-                                                  ).format(draftSlice.value
-                                                      .trialEndDate!
-                                                      .toLocal())
+                                                  ).format(
+                                                    draftSlice
+                                                        .value
+                                                        .trialEndDate!
+                                                        .toLocal(),
+                                                  )
                                                 : 'detail.not_set'.tr(),
                                             style: theme.textTheme.bodyMedium,
                                           ),
@@ -688,7 +768,8 @@ class AddSubsSheet extends HookConsumerWidget {
                                           Icons.chevron_right_rounded,
                                           size: 18,
                                           color: theme
-                                              .colorScheme.onSurfaceVariant,
+                                              .colorScheme
+                                              .onSurfaceVariant,
                                         ),
                                       ],
                                     ),
@@ -707,8 +788,7 @@ class AddSubsSheet extends HookConsumerWidget {
                                   vertical: 4,
                                 ),
                                 child: Row(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Padding(
                                       padding: const EdgeInsets.only(top: 12),
@@ -755,10 +835,8 @@ class AddSubsSheet extends HookConsumerWidget {
                           final isSelected =
                               c.toARGB32() == draftSlice.value.color;
                           return GestureDetector(
-                            onTap: () => draftSlice.value =
-                                draftSlice.value.copyWith(
-                              color: c.toARGB32(),
-                            ),
+                            onTap: () => draftSlice.value = draftSlice.value
+                                .copyWith(color: c.toARGB32()),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               curve: Curves.easeOut,
@@ -829,7 +907,8 @@ class AddSubsSheet extends HookConsumerWidget {
                                             width: 2,
                                           ),
                                           backgroundColor: theme
-                                              .colorScheme.primaryContainer
+                                              .colorScheme
+                                              .primaryContainer
                                               .withValues(alpha: 0.3),
                                         )
                                       : null,
@@ -1007,6 +1086,66 @@ class _SheetSkeleton extends StatelessWidget {
         child,
         const SizedBox(height: 16),
       ],
+    );
+  }
+}
+
+/// "Monthly", "Every 2 months", ... up to every 12 periods.
+class _IntervalDropdown extends StatelessWidget {
+  const _IntervalDropdown({
+    required this.frequency,
+    required this.interval,
+    required this.onChanged,
+  });
+
+  final Frequency frequency;
+  final int interval;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonHideUnderline(
+      child: DropdownButton<int>(
+        isExpanded: true,
+        value: interval.clamp(1, SubSlice.maxInterval),
+        style: Theme.of(context).textTheme.bodyMedium,
+        items: List.generate(SubSlice.maxInterval, (i) {
+          final n = i + 1;
+          return DropdownMenuItem(
+            value: n,
+            child: Text(cycleLabelFor(frequency, n)),
+          );
+        }),
+        onChanged: (n) {
+          if (n != null) onChanged(n);
+        },
+      ),
+    );
+  }
+}
+
+/// Compact currency code picker shown at the end of the price field.
+class _CurrencyDropdown extends StatelessWidget {
+  const _CurrencyDropdown({required this.value, required this.onChanged});
+
+  final Currency value;
+  final ValueChanged<Currency> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonHideUnderline(
+      child: DropdownButton<Currency>(
+        value: value,
+        isDense: true,
+        style: Theme.of(context).textTheme.labelLarge,
+        items: [
+          for (final c in Currency.values)
+            DropdownMenuItem(value: c, child: Text(c.code)),
+        ],
+        onChanged: (c) {
+          if (c != null) onChanged(c);
+        },
+      ),
     );
   }
 }

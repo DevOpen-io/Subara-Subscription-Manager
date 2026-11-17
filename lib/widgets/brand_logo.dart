@@ -42,11 +42,7 @@ class SubLeadingIcon extends StatelessWidget {
 }
 
 class BrandLogo extends StatelessWidget {
-  const BrandLogo({
-    super.key,
-    required this.brand,
-    this.size = 32,
-  });
+  const BrandLogo({super.key, required this.brand, this.size = 32});
 
   final Brand? brand;
   final double size;

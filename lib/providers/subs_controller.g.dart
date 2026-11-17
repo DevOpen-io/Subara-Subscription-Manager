@@ -15,13 +15,13 @@ final subsStorageProvider = SubsStorageProvider._();
 final class SubsStorageProvider
     extends
         $FunctionalProvider<
-          AsyncValue<JsonSqFliteStorage>,
-          JsonSqFliteStorage,
-          FutureOr<JsonSqFliteStorage>
+          AsyncValue<Storage<String, String>>,
+          Storage<String, String>,
+          FutureOr<Storage<String, String>>
         >
     with
-        $FutureModifier<JsonSqFliteStorage>,
-        $FutureProvider<JsonSqFliteStorage> {
+        $FutureModifier<Storage<String, String>>,
+        $FutureProvider<Storage<String, String>> {
   SubsStorageProvider._()
     : super(
         from: null,
@@ -38,17 +38,17 @@ final class SubsStorageProvider
 
   @$internal
   @override
-  $FutureProviderElement<JsonSqFliteStorage> $createElement(
+  $FutureProviderElement<Storage<String, String>> $createElement(
     $ProviderPointer pointer,
   ) => $FutureProviderElement(pointer);
 
   @override
-  FutureOr<JsonSqFliteStorage> create(Ref ref) {
+  FutureOr<Storage<String, String>> create(Ref ref) {
     return subsStorage(ref);
   }
 }
 
-String _$subsStorageHash() => r'd34a562d430304a2e0dcc8e8db2a01f74e768ca3';
+String _$subsStorageHash() => r'4acc4ca046a5620b36fbf0217848c11a36b370fc';
 
 @ProviderFor(SubsController)
 @JsonPersist()
@@ -76,7 +76,7 @@ final class SubsControllerProvider
   SubsController create() => SubsController();
 }
 
-String _$subsControllerHash() => r'935c80d3474c1f8ea28f1d536012cd52d1e82292';
+String _$subsControllerHash() => r'ceab2e29cd1aede851dc24a4433477299869a73a';
 
 @JsonPersist()
 abstract class _$SubsControllerBase extends $AsyncNotifier<List<SubSlice>> {

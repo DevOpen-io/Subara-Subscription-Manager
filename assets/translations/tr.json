@@ -19,7 +19,28 @@
 		"app_name": "Subara",
 		"notifications_title": "Bildirimler",
 		"notify_due_today": "Bugün vadesi dolan hatırlatıcılar",
-		"notify_due_tomorrow": "Yarın vadesi dolan hatırlatıcılar"
+		"notify_due_tomorrow": "Yarın vadesi dolan hatırlatıcılar",
+		"reminder_time": "Hatırlatma saati",
+		"exact_reminders": "Tam saatinde hatırlat",
+		"exact_reminders_on": "Hatırlatmalar seçtiğin saatte gelir.",
+		"exact_reminders_off": "Android hatırlatmaları bir saate kadar geç gösterebilir.",
+		"exchange_rates": "Döviz kurları",
+		"exchange_rates_none": "Girilmedi",
+		"exchange_rates_count": {
+			"one": "1 kur",
+			"other": "{} kur"
+		},
+		"exchange_rates_hint": "Kurları siz girersiniz; internetten indirilmez.",
+		"budget": "Aylık bütçe",
+		"budget_none": "Belirlenmedi",
+		"budget_title": "Aylık bütçe",
+		"budget_hint": "Aboneliklerinin bütçeye ne kadar yaklaştığını görürsün.",
+		"budget_invalid": "0'dan büyük bir sayı girin",
+		"budget_remove": "Kaldır",
+		"security": "Güvenlik",
+		"app_lock": "Uygulama kilidi",
+		"app_lock_desc": "Uygulamayı açmak için parmak izi, yüz veya ekran kilidi istensin.",
+		"app_lock_unsupported": "Önce cihazda bir ekran kilidi ayarlayın."
 	},
 	"home": {
 		"no_subs": "Henüz Abonelik Eklenmedi.",
@@ -47,7 +68,24 @@
 		"sort_amount_desc": "Tutar (yüksekten düşüğe)",
 		"total_spending_yearly": "Toplam Yıllık Harcama",
 		"view_monthly": "Aylık",
-		"view_yearly": "Yıllık"
+		"view_yearly": "Yıllık",
+		"upcoming_title": "Önümüzdeki 7 gün",
+		"upcoming_count": {
+			"zero": "Ödeme yok",
+			"one": "1 ödeme",
+			"other": "{} ödeme"
+		},
+		"missing_rates": "{} toplama dahil değil. Ayarlar'dan kur girin.",
+		"search_hint": "Abonelik ara",
+		"no_matches": "Eşleşen abonelik yok",
+		"budget": "{} / {} bütçe",
+		"over_budget": "Bütçe {} aşıldı",
+		"unpaid": "Ödenmedi",
+		"overdue": "Gecikmiş",
+		"archive": "Arşiv ({})",
+		"archive_title": "Arşiv",
+		"archive_hint": "İptal edilen abonelikler. Yeniden etkinleştirmek için açın.",
+		"archive_saved": "{} tasarruf"
 	},
 	"frequency": {
 		"daily": "Günlük",
@@ -59,6 +97,36 @@
 			"weekly": "/hft",
 			"monthly": "/ay",
 			"yearly": "/yıl"
+		},
+		"every": {
+			"daily": "{} günde bir",
+			"weekly": "{} haftada bir",
+			"monthly": "{} ayda bir",
+			"yearly": "{} yılda bir"
+		},
+		"short_every": {
+			"daily": "/{} gün",
+			"weekly": "/{} hft",
+			"monthly": "/{} ay",
+			"yearly": "/{} yıl"
+		},
+		"unit": {
+			"daily": {
+				"one": "gün",
+				"other": "gün"
+			},
+			"weekly": {
+				"one": "hafta",
+				"other": "hafta"
+			},
+			"monthly": {
+				"one": "ay",
+				"other": "ay"
+			},
+			"yearly": {
+				"one": "yıl",
+				"other": "yıl"
+			}
 		}
 	},
 	"intro": {
@@ -136,7 +204,8 @@
 		"or_enter_manually": "VEYA MANUEL GİRİN",
 		"note_label": "Not",
 		"status_label": "Durum",
-		"trial_ends_label": "Deneme bitiş"
+		"trial_ends_label": "Deneme bitiş",
+		"repeat_label": "Tekrar"
 	},
 	"menu": {
 		"main_menu": "Ana Menü",
@@ -167,7 +236,9 @@
 		"import_confirm_action": "İçe Aktar",
 		"subscriptions": "Abonelikler",
 		"calendar": "Takvim",
-		"analytics": "Analiz"
+		"analytics": "Analiz",
+		"export_csv": "CSV olarak dışa aktar",
+		"export_calendar": "Takvime ekle (.ics)"
 	},
 	"analytics": {
 		"no_data": "Henüz analiz edilecek abonelik verisi yok.",
@@ -186,19 +257,19 @@
 		"period_year": "Yıl",
 		"chart_title": "Harcama Özeti",
 		"chart_mode_amount": "Tutar",
-		"chart_mode_share": "Pay"
-	},
-	"frequency_names": {
-		"daily": "GÜNLÜK",
-		"weekly": "HAFTALIK",
-		"monthly": "AYLIK",
-		"yearly": "YILLIK"
+		"chart_mode_share": "Pay",
+		"saved_total": "İptallerle tasarruf",
+		"by_payment_method": "Ödeme yöntemine göre",
+		"method_not_set": "Belirtilmemiş",
+		"subs_count": {
+			"one": "1 abonelik",
+			"other": "{} abonelik"
+		}
 	},
 	"detail": {
 		"back": "Abonelikler",
 		"active": "Aktif",
 		"cost": "TUTAR",
-		"per_frequency": "{} başına",
 		"next_charge": "SONRAKI ÖDEME",
 		"in_days": "{} gün sonra",
 		"today": "bugün",
@@ -214,8 +285,6 @@
 		"reminder": "Hatırlatıcı",
 		"reminder_none": "Kapalı",
 		"reminder_onDay": "Gün içinde",
-		"reminder_dayBefore": "Bir gün önce",
-		"reminder_both": "Tümü",
 		"not_set": "—",
 		"delete": "Aboneliği Sil",
 		"delete_confirm": "{} aboneliğini silmek istediğinizden emin misiniz?",
@@ -229,6 +298,75 @@
 		"status_freeTrial": "Ücretsiz Deneme",
 		"status_paused": "Duraklatıldı",
 		"status_cancelled": "İptal Edildi",
-		"trial_ends": "Deneme bitişi"
+		"trial_ends": "Deneme bitişi",
+		"reminder_days_before": {
+			"one": "1 gün önce",
+			"other": "{} gün önce"
+		},
+		"reminder_when": "Ne zaman hatırlatılsın",
+		"reminder_how_early": "Ne kadar önce",
+		"manage_link": "Yönetim linki",
+		"manage_hint": "netflix.com/account",
+		"manage_invalid": "Geçerli bir web adresi girin",
+		"manage_open": "Aboneliği yönet",
+		"manage_open_failed": "Link açılamadı",
+		"manage_remove": "Kaldır",
+		"saved": "TASARRUF",
+		"saved_since": "{} tarihinden beri",
+		"currency": "Para birimi",
+		"currency_main": "Ana para birimi ({})",
+		"section_price_changes": "FİYAT DEĞİŞİKLİKLERİ",
+		"price_change_delete_title": "Fiyat değişikliği silinsin mi?",
+		"price_change_delete_body": "Fiyat yanlışlıkla girildiyse kullanın. Geçmiş ödemeler bir sonraki fiyatla gösterilir.",
+		"shared_with": "Paylaşım",
+		"shared_just_me": "Sadece ben",
+		"shared_people": {
+			"one": "1 kişi",
+			"other": "{} kişi"
+		},
+		"your_share": "payın {}",
+		"payment_method_hint": "ör. Kredi kartı",
+		"auto_renew": "Otomatik yenilenir",
+		"payment_due": "Ödeme bekleniyor: {}",
+		"payment_overdue": "{} tarihinden beri gecikmiş",
+		"mark_paid": "Ödendi",
+		"category_add": "Yeni kategori",
+		"category_remove": "Kategoriyi sil",
+		"category_hint": "ör. Sigorta",
+		"snooze": "Hatırlatmaları ertele",
+		"snooze_week": "1 hafta",
+		"snooze_month": "1 ay",
+		"snooze_resume": "Devam et",
+		"snoozed_until": "{} tarihine kadar ertelendi"
+	},
+	"notifications": {
+		"title": "Abonelik Hatırlatıcı",
+		"due_today": "{} aboneliğinin ödemesi bugün.",
+		"due_tomorrow": "{} aboneliğinin ödemesi yarın.",
+		"trial_ends_today": "{} ücretsiz denemen bugün bitiyor.",
+		"trial_ends_tomorrow": "{} ücretsiz denemen yarın bitiyor.",
+		"due_in_days": "{} aboneliğinin ödemesine {} gün kaldı.",
+		"trial_ends_in_days": "{} ücretsiz denemenin bitmesine {} gün kaldı.",
+		"overdue": "{} ödemesi gecikti. Ödediysen ödendi olarak işaretle.",
+		"mark_paid": "Ödendi"
+	},
+	"rates": {
+		"title": "Döviz kuru",
+		"equals": "1 {} =",
+		"invalid": "0'dan büyük bir sayı girin",
+		"remove": "Kaldır"
+	},
+	"lock": {
+		"title": "Subara kilitli",
+		"unlock": "Kilidi aç",
+		"reason": "Subara kilidini aç"
+	},
+	"payment_methods": {
+		"credit_card": "Kredi kartı",
+		"debit_card": "Banka kartı",
+		"paypal": "PayPal",
+		"apple_pay": "Apple Pay",
+		"google_pay": "Google Pay",
+		"bank_transfer": "Havale/EFT"
 	}
 }

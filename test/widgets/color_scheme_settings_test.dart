@@ -26,10 +26,7 @@ void main() {
     });
 
     test('defaults to bahamaBlue when colorScheme missing from JSON', () {
-      final json = <String, dynamic>{
-        'theme': 'light',
-        'currency': 'usd',
-      };
+      final json = <String, dynamic>{'theme': 'light', 'currency': 'usd'};
       final vm = SettingsViewModel.fromJson(json);
       expect(vm.colorScheme, FlexScheme.bahamaBlue);
     });

@@ -4,35 +4,55 @@ import 'package:subs_tracker/services/widget_update_service.dart';
 
 void main() {
   group('WidgetUpdateService.buildWidgetData', () {
-    test('empty subs list produces correct shape with empty array and 0.0 total', () {
-      final data = WidgetUpdateService.buildWidgetData([], r'$');
+    test(
+      'empty subs list produces correct shape with empty array and 0.0 total',
+      () {
+        final data = WidgetUpdateService.buildWidgetData([], r'$');
 
-      expect(data['subs'], isEmpty);
-      expect(data['currency'], r'$');
-      expect(data['monthlyTotal'], 0.0);
-    });
+        expect(data['subs'], isEmpty);
+        expect(data['currency'], r'$');
+        expect(data['monthlyTotal'], 0.0);
+      },
+    );
 
-    test('monthly sub has correct monthlyAmount, startDate format, frequency string', () {
-      final start = DateTime(2025, 1, 15);
+    test(
+      'monthly sub has correct monthlyAmount, startDate format, frequency string',
+      () {
+        final start = DateTime(2025, 1, 15);
+        final sub = SubSlice(
+          name: 'Netflix',
+          amount: 9.99,
+          color: 0xFFFF0000,
+          startDate: start,
+        );
+
+        final data = WidgetUpdateService.buildWidgetData([sub], r'$');
+
+        final subs = data['subs'] as List;
+        expect(subs.length, 1);
+        final entry = subs[0] as Map<String, dynamic>;
+        expect(entry['name'], 'Netflix');
+        expect(entry['amount'], 9.99);
+        expect(entry['monthlyAmount'], 9.99);
+        expect(entry['startDate'], start.toIso8601String());
+        expect(entry['frequency'], 'monthly');
+        expect(entry['color'], 0xFFFF0000);
+        expect(data['monthlyTotal'], 9.99);
+      },
+    );
+
+    test('every-N cycle passes interval for the native widget', () {
       final sub = SubSlice(
-        name: 'Netflix',
-        amount: 9.99,
-        color: 0xFFFF0000,
-        startDate: start,
+        name: 'Q',
+        amount: 30,
+        color: 0,
+        startDate: DateTime(2025, 1, 15),
+        interval: 3,
       );
-
       final data = WidgetUpdateService.buildWidgetData([sub], r'$');
-
-      final subs = data['subs'] as List;
-      expect(subs.length, 1);
-      final entry = subs[0] as Map<String, dynamic>;
-      expect(entry['name'], 'Netflix');
-      expect(entry['amount'], 9.99);
-      expect(entry['monthlyAmount'], 9.99);
-      expect(entry['startDate'], start.toIso8601String());
-      expect(entry['frequency'], 'monthly');
-      expect(entry['color'], 0xFFFF0000);
-      expect(data['monthlyTotal'], 9.99);
+      final entry = (data['subs'] as List)[0] as Map<String, dynamic>;
+      expect(entry['interval'], 3);
+      expect(entry['monthlyAmount'], closeTo(10, 1e-9));
     });
 
     test('yearly sub has correct monthlyAmount (amount / 12)', () {

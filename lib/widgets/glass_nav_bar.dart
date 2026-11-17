@@ -41,9 +41,10 @@ class _GlassNavBarState extends State<GlassNavBar>
       duration: _snappyMotion.duration,
     );
     final idx = widget.selectedIndex.toDouble();
-    _position = Tween<double>(begin: idx, end: idx)
-        .chain(CurveTween(curve: _springCurve))
-        .animate(_controller);
+    _position = Tween<double>(
+      begin: idx,
+      end: idx,
+    ).chain(CurveTween(curve: _springCurve)).animate(_controller);
   }
 
   @override
@@ -52,9 +53,10 @@ class _GlassNavBarState extends State<GlassNavBar>
     if (oldWidget.selectedIndex != widget.selectedIndex) {
       final from = _position.value;
       final to = widget.selectedIndex.toDouble();
-      _position = Tween<double>(begin: from, end: to)
-          .chain(CurveTween(curve: _springCurve))
-          .animate(_controller);
+      _position = Tween<double>(
+        begin: from,
+        end: to,
+      ).chain(CurveTween(curve: _springCurve)).animate(_controller);
       _controller.forward(from: 0);
     }
   }
@@ -85,87 +87,88 @@ class _GlassNavBarState extends State<GlassNavBar>
         child: LiquidGlass(
           shape: const LiquidRoundedSuperellipse(borderRadius: 28),
           child: LayoutBuilder(
-              builder: (context, constraints) {
-                final tabWidth = constraints.maxWidth / _tabs.length;
-                return AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, _) {
-                    final pos = _position.value;
-                    return SizedBox(
-                      height: 64,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: tabWidth * pos,
-                            top: 6,
-                            bottom: 6,
-                            width: tabWidth,
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 6),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: cs.primary.withValues(alpha: 0.20),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
+            builder: (context, constraints) {
+              final tabWidth = constraints.maxWidth / _tabs.length;
+              return AnimatedBuilder(
+                animation: _controller,
+                builder: (context, _) {
+                  final pos = _position.value;
+                  return SizedBox(
+                    height: 64,
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          left: tabWidth * pos,
+                          top: 6,
+                          bottom: 6,
+                          width: tabWidth,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 6),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: cs.primary.withValues(alpha: 0.20),
+                                borderRadius: BorderRadius.circular(20),
                               ),
                             ),
                           ),
-                          Row(
-                            children: List.generate(_tabs.length, (index) {
-                              final activation =
-                                  (1.0 - (pos - index).abs()).clamp(0.0, 1.0);
-                              final color = Color.lerp(
-                                cs.onSurfaceVariant.withValues(alpha: 0.6),
-                                cs.primary,
-                                activation,
-                              )!;
-                              return Expanded(
-                                child: Semantics(
-                                  label: _tabs[index].labelKey.tr(),
-                                  selected: index == widget.selectedIndex,
-                                  button: true,
-                                  child: GestureDetector(
-                                    behavior: HitTestBehavior.opaque,
-                                    onTap: () {
-                                      HapticFeedback.lightImpact();
-                                      widget.onTap(index);
-                                    },
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(_tabs[index].icon,
-                                            color: color, size: 22),
-                                        const SizedBox(height: 3),
-                                        Text(
-                                          _tabs[index].labelKey.tr(),
-                                          style: TextStyle(
-                                            color: color,
-                                            fontSize: 12,
-                                            fontWeight: activation > 0.5
-                                                ? FontWeight.bold
-                                                : FontWeight.normal,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Row(
+                          children: List.generate(_tabs.length, (index) {
+                            final activation = (1.0 - (pos - index).abs())
+                                .clamp(0.0, 1.0);
+                            final color = Color.lerp(
+                              cs.onSurfaceVariant.withValues(alpha: 0.6),
+                              cs.primary,
+                              activation,
+                            )!;
+                            return Expanded(
+                              child: Semantics(
+                                label: _tabs[index].labelKey.tr(),
+                                selected: index == widget.selectedIndex,
+                                button: true,
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {
+                                    HapticFeedback.lightImpact();
+                                    widget.onTap(index);
+                                  },
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        _tabs[index].icon,
+                                        color: color,
+                                        size: 22,
+                                      ),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        _tabs[index].labelKey.tr(),
+                                        style: TextStyle(
+                                          color: color,
+                                          fontSize: 12,
+                                          fontWeight: activation > 0.5
+                                              ? FontWeight.bold
+                                              : FontWeight.normal,
                                         ),
-                                      ],
-                                    ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              );
-                            }),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
+                              ),
+                            );
+                          }),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
           ),
         ),
+      ),
     );
   }
 }

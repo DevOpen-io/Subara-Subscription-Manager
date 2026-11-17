@@ -29,7 +29,6 @@ class _SubsPieState extends State<SubsPie> {
         AspectRatio(
           aspectRatio: 1.2,
           child: PieChart(
-            
             key: ValueKey(slices.hashCode),
             PieChartData(
               sectionsSpace: 5,
@@ -45,7 +44,9 @@ class _SubsPieState extends State<SubsPie> {
               sections: List.generate(slices.length, (i) {
                 final s = slices[i];
                 final isTouched = i == touchedIndex;
-                final percent = total == 0 ? 0 : (s.monthlyAmount / total) * 100;
+                final percent = total == 0
+                    ? 0
+                    : (s.monthlyAmount / total) * 100;
                 return PieChartSectionData(
                   color: Color(s.color),
                   value: s.monthlyAmount,
@@ -92,7 +93,12 @@ class _Badge extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(4),
-        child: SubLeadingIcon(name: name, brand: brand, color: borderColor, size: 24),
+        child: SubLeadingIcon(
+          name: name,
+          brand: brand,
+          color: borderColor,
+          size: 24,
+        ),
       ),
     );
   }

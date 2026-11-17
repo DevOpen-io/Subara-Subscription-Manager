@@ -15,13 +15,13 @@ final settingsStorageProvider = SettingsStorageProvider._();
 final class SettingsStorageProvider
     extends
         $FunctionalProvider<
-          AsyncValue<JsonSqFliteStorage>,
-          JsonSqFliteStorage,
-          FutureOr<JsonSqFliteStorage>
+          AsyncValue<Storage<String, String>>,
+          Storage<String, String>,
+          FutureOr<Storage<String, String>>
         >
     with
-        $FutureModifier<JsonSqFliteStorage>,
-        $FutureProvider<JsonSqFliteStorage> {
+        $FutureModifier<Storage<String, String>>,
+        $FutureProvider<Storage<String, String>> {
   SettingsStorageProvider._()
     : super(
         from: null,
@@ -38,17 +38,17 @@ final class SettingsStorageProvider
 
   @$internal
   @override
-  $FutureProviderElement<JsonSqFliteStorage> $createElement(
+  $FutureProviderElement<Storage<String, String>> $createElement(
     $ProviderPointer pointer,
   ) => $FutureProviderElement(pointer);
 
   @override
-  FutureOr<JsonSqFliteStorage> create(Ref ref) {
+  FutureOr<Storage<String, String>> create(Ref ref) {
     return settingsStorage(ref);
   }
 }
 
-String _$settingsStorageHash() => r'a3a38c976342a6e31db1075c1f8fad90f4a5eb0a';
+String _$settingsStorageHash() => r'7b1a7da93f4e6c1d439582511bb9a05d35aef81a';
 
 @ProviderFor(SettingsController)
 @JsonPersist()
@@ -77,7 +77,7 @@ final class SettingsControllerProvider
 }
 
 String _$settingsControllerHash() =>
-    r'125557f6cd8d5047c503eaff774a4a994d570f92';
+    r'5d7d22d6098d5459598ee223d1620d520f93b0a3';
 
 @JsonPersist()
 abstract class _$SettingsControllerBase

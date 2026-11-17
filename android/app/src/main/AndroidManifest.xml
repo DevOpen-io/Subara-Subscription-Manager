@@ -5,6 +5,9 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/>
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+    <!-- Exact reminder times, only if the user allows it in Settings. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <application android:label="Subara" android:name="${applicationName}" android:icon="@mipmap/ic_launcher" android:enableOnBackInvokedCallback="true">
         <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop" android:taskAffinity="" android:theme="@style/LaunchTheme" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize">
             <!-- Specifies an Android theme to apply to this Activity as soon as

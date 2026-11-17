@@ -28,10 +28,19 @@ class _SubsBarState extends State<SubsBar> {
     return _buildChart(widget.slices, widget.currency, widget.multiplier);
   }
 
-  Widget _buildChart(List<SubSlice> slices, String currency, double multiplier) {
+  Widget _buildChart(
+    List<SubSlice> slices,
+    String currency,
+    double multiplier,
+  ) {
     if (slices.isEmpty) return const SizedBox.shrink();
 
-    final maxY = slices.fold<double>(0, (a, b) => a > b.monthlyAmount ? a : b.monthlyAmount) * multiplier;
+    final maxY =
+        slices.fold<double>(
+          0,
+          (a, b) => a > b.monthlyAmount ? a : b.monthlyAmount,
+        ) *
+        multiplier;
 
     return AspectRatio(
       aspectRatio: 1.2,
@@ -82,12 +91,14 @@ class _SubsBarState extends State<SubsBar> {
                 showTitles: true,
                 reservedSize: 52,
                 getTitlesWidget: (value, meta) {
-                  if (value == meta.max || value == 0) return const SizedBox.shrink();
+                  if (value == meta.max || value == 0) {
+                    return const SizedBox.shrink();
+                  }
                   return Text(
                     '$currency${value.toStringAsFixed(0)}',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                     textAlign: TextAlign.right,
                   );
                 },
@@ -99,7 +110,9 @@ class _SubsBarState extends State<SubsBar> {
                 reservedSize: 44,
                 getTitlesWidget: (value, meta) {
                   final i = value.toInt();
-                  if (i < 0 || i >= slices.length) return const SizedBox.shrink();
+                  if (i < 0 || i >= slices.length) {
+                    return const SizedBox.shrink();
+                  }
                   final s = slices[i];
                   return Padding(
                     padding: const EdgeInsets.only(top: 4),
@@ -116,7 +129,9 @@ class _SubsBarState extends State<SubsBar> {
           gridData: FlGridData(
             drawVerticalLine: false,
             getDrawingHorizontalLine: (value) => FlLine(
-              color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5),
+              color: Theme.of(
+                context,
+              ).colorScheme.outlineVariant.withValues(alpha: 0.5),
               strokeWidth: 1,
             ),
           ),

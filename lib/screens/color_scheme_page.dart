@@ -136,8 +136,9 @@ class ColorSchemePage extends ConsumerWidget {
         const SizedBox(height: 20),
         ColorSchemePicker(
           selectedScheme: scheme,
-          onSchemeSelected: (s) =>
-              ref.read(settingsControllerProvider.notifier).updateColorScheme(s),
+          onSchemeSelected: (s) => ref
+              .read(settingsControllerProvider.notifier)
+              .updateColorScheme(s),
         ),
         const SizedBox(height: 32),
       ],
@@ -146,11 +147,7 @@ class ColorSchemePage extends ConsumerWidget {
 }
 
 class _SchemeNameChip extends StatelessWidget {
-  const _SchemeNameChip({
-    super.key,
-    required this.name,
-    required this.color,
-  });
+  const _SchemeNameChip({super.key, required this.name, required this.color});
 
   final String name;
   final Color color;

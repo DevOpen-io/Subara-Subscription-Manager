@@ -9,7 +9,8 @@ data class WidgetSub(
     val monthlyAmount: Double,
     val startDate: String,   // ISO 8601, no timezone
     val frequency: String,   // "daily" | "weekly" | "monthly" | "yearly"
-    val color: Long          // ARGB as Long (Flutter Color.value)
+    val color: Long,         // ARGB as Long (Flutter Color.value)
+    val interval: Int = 1    // charges every [interval] periods
 )
 
 data class WidgetData(
@@ -33,7 +34,8 @@ object SubsDataReader {
                     monthlyAmount = s.getDouble("monthlyAmount"),
                     startDate = s.getString("startDate"),
                     frequency = s.getString("frequency"),
-                    color = s.getLong("color")
+                    color = s.getLong("color"),
+                    interval = maxOf(1, s.optInt("interval", 1))
                 )
             }
             WidgetData(

@@ -186,7 +186,7 @@ class NextDueWidget : GlanceAppWidget() {
         val sorted = data?.subs
             ?.mapNotNull { sub ->
                 NextDueDateHelper.parseDate(sub.startDate)?.let { start ->
-                    val due = NextDueDateHelper.nextDueDate(start, sub.frequency, today)
+                    val due = NextDueDateHelper.nextDueDate(start, sub.frequency, today, sub.interval)
                     Triple(sub, due, NextDueDateHelper.daysUntil(due, today))
                 }
             }
@@ -270,7 +270,7 @@ class UpcomingWidget : GlanceAppWidget() {
         val sorted = data?.subs
             ?.mapNotNull { sub ->
                 NextDueDateHelper.parseDate(sub.startDate)?.let { start ->
-                    Pair(sub, NextDueDateHelper.nextDueDate(start, sub.frequency, today))
+                    Pair(sub, NextDueDateHelper.nextDueDate(start, sub.frequency, today, sub.interval))
                 }
             }
             ?.sortedBy { it.second }

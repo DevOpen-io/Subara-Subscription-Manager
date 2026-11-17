@@ -11,7 +11,7 @@ void main() {
         startDate: DateTime.now(),
         frequency: Frequency.daily,
       );
-      expect(slice.monthlyAmount, 300); // 10 * 30
+      expect(slice.monthlyAmount, closeTo(10 * 365 / 12, 1e-9));
     });
 
     test('monthlyAmount calculates correctly for Weekly', () {
@@ -22,7 +22,7 @@ void main() {
         startDate: DateTime.now(),
         frequency: Frequency.weekly,
       );
-      expect(slice.monthlyAmount, 43.3); // 10 * 4.33
+      expect(slice.monthlyAmount, closeTo(10 * 365 / 12 / 7, 1e-9));
     });
 
     test('monthlyAmount calculates correctly for Monthly', () {
@@ -69,12 +69,12 @@ void main() {
 
   group('SubSliceListX.activeOnly', () {
     SubSlice makeSlice(String name, SubStatus status) => SubSlice(
-          name: name,
-          amount: 10,
-          color: 0,
-          startDate: DateTime.now(),
-          status: status,
-        );
+      name: name,
+      amount: 10,
+      color: 0,
+      startDate: DateTime.now(),
+      status: status,
+    );
 
     test('keeps only active subscriptions', () {
       final slices = [

@@ -57,9 +57,9 @@ class _ChooseOrEditPPState extends ConsumerState<EditUserProfileDialog> {
                       .read(settingsControllerProvider.notifier)
                       .updateUserEmail(newEmail);
 
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text('intro.email_saved'.tr())));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('intro.email_saved'.tr())),
+                  );
                 },
               ),
             ],

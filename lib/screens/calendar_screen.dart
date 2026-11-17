@@ -4,8 +4,12 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../models/billing.dart';
+import '../models/money.dart';
 import '../models/sub_slice.dart';
+import '../providers/settings_controller.dart';
 import '../providers/subs_controller.dart';
+import '../utils/billing_labels.dart';
 import '../widgets/brand_logo.dart';
 import '../widgets/sub_zilla_app_bar.dart';
 
@@ -15,38 +19,19 @@ class CalendarScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final subsAsync = ref.watch(subsControllerProvider);
+    final settings = ref.watch(settingsControllerProvider).value;
     final focusedDay = useState(DateTime.now());
     final selectedDay = useState<DateTime?>(DateTime.now());
 
-    List<SubSlice> getEventsForDay(DateTime day, List<SubSlice> subs) {
-      return subs.where((sub) {
-        final start = sub.startDate;
-        
-        // Normalize dates to ignore time
-        final d = DateTime(day.year, day.month, day.day);
-        final s = DateTime(start.year, start.month, start.day);
-
-        if (d.isBefore(s)) return false;
-
-        switch (sub.frequency) {
-          case Frequency.daily:
-            return true;
-          case Frequency.weekly:
-            return d.weekday == s.weekday;
-          case Frequency.monthly:
-            // Handle end of month edge cases if needed, but for now simple day check
-            // If start day is 31st, and current month has 30 days, it usually skips or moves to last day.
-            // Simple logic: match day. 
-            // Better logic: if start day > days in month, check if day is last day of month?
-            // Let's stick to simple day matching for now, or better:
-            // If sub starts on 31st, it should show on 30th of June?
-            // Let's keep it simple: match day.
-            return d.day == s.day;
-          case Frequency.yearly:
-            return d.month == s.month && d.day == s.day;
-        }
-      }).toList();
-    }
+    // Paused and cancelled subscriptions aren't charged.
+    List<SubSlice> getEventsForDay(DateTime day, List<SubSlice> subs) => subs
+        .where(
+          (sub) =>
+              sub.status != SubStatus.paused &&
+              sub.status != SubStatus.cancelled &&
+              sub.isDueOn(day),
+        )
+        .toList();
 
     return Scaffold(
       appBar: const SubaraAppBar(),
@@ -59,10 +44,13 @@ class CalendarScreen extends HookConsumerWidget {
           return Column(
             children: [
               TableCalendar<SubSlice>(
+                locale: context.locale.toString(),
                 firstDay: DateTime.utc(2020),
-                lastDay: DateTime.utc(2030, 12, 31),
+                // Relative, so the calendar never runs past its last day.
+                lastDay: DateTime.utc(DateTime.now().year + 10, 12, 31),
                 focusedDay: focusedDay.value,
-                selectedDayPredicate: (day) => isSameDay(selectedDay.value, day),
+                selectedDayPredicate: (day) =>
+                    isSameDay(selectedDay.value, day),
                 onDaySelected: (selected, focused) {
                   selectedDay.value = selected;
                   focusedDay.value = focused;
@@ -90,7 +78,9 @@ class CalendarScreen extends HookConsumerWidget {
                 calendarStyle: CalendarStyle(
                   cellMargin: const EdgeInsets.all(8),
                   todayDecoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.5),
                     shape: BoxShape.circle,
                   ),
                   selectedDecoration: BoxDecoration(
@@ -108,12 +98,10 @@ class CalendarScreen extends HookConsumerWidget {
                 child: ListView.builder(
                   itemCount: selectedEvents.length,
                   itemBuilder: (context, index) {
-                    final  sub = selectedEvents[index];
+                    final sub = selectedEvents[index];
                     return ListTile(
                       leading: sub.brand != null
-                          ? BrandLogo(
-                              brand: sub.brand,
-                            )
+                          ? BrandLogo(brand: sub.brand)
                           : CircleAvatar(
                               radius: 16,
                               backgroundColor: Color(sub.color),
@@ -121,9 +109,9 @@ class CalendarScreen extends HookConsumerWidget {
                             ),
                       title: Text(sub.name),
                       subtitle: Text(
-                        NumberFormat.simpleCurrency().format(sub.amount),
+                        '${settings?.currencyOf(sub).symbol ?? ''}${sub.amount.toStringAsFixed(2)}',
                       ),
-                      trailing: Text('frequency_names.${sub.frequency.name}'.tr()),
+                      trailing: Text(sub.cycleLabel),
                     );
                   },
                 ),

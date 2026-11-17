@@ -8,7 +8,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: IntroPage(onGetStarted: () => called = true),
+          body: IntroPage(onGetStarted: () => called = true, onRestore: () {}),
         ),
       ),
     );
@@ -21,11 +21,17 @@ void main() {
     expect(called, isTrue);
   });
 
-  testWidgets('IntroPage fades Netflix card when pageOffset > 0', (tester) async {
+  testWidgets('IntroPage fades Netflix card when pageOffset > 0', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: IntroPage(onGetStarted: () {}, pageOffset: 0.5),
+          body: IntroPage(
+            onGetStarted: () {},
+            onRestore: () {},
+            pageOffset: 0.5,
+          ),
         ),
       ),
     );
@@ -34,9 +40,6 @@ void main() {
     // Netflix card is wrapped in Opacity — find the one that fades with pageOffset
     final opacityWidgets = tester.widgetList<Opacity>(find.byType(Opacity));
     // (1.0 - 0.5 * 3).clamp(0,1) = 0.0 — at 0.5 the card is fully faded
-    expect(
-      opacityWidgets.any((o) => o.opacity == 0.0),
-      isTrue,
-    );
+    expect(opacityWidgets.any((o) => o.opacity == 0.0), isTrue);
   });
 }

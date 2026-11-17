@@ -1,12 +1,17 @@
 import 'dart:math';
 import 'dart:ui' show lerpDouble;
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../config/router_config.dart';
 import '../providers/settings_controller.dart';
+import '../providers/subs_controller.dart';
+import '../utils/backup_file.dart';
 import '../widgets/floating_sub_card.dart';
 import '../widgets/page_dots.dart';
 import 'color_scheme_page.dart';
@@ -57,6 +62,30 @@ class OnboardingScreen extends HookConsumerWidget {
 
     const totalPages = 3;
 
+    /// Restores a backup and skips the rest of onboarding.
+    Future<void> restoreBackup() async {
+      final messenger = ScaffoldMessenger.of(context);
+      final router = GoRouter.of(context);
+      final text = await pickBackupFile();
+      if (text == null) return;
+      final ok = await ref
+          .read(subsControllerProvider.notifier)
+          .importFromJson(text, restoreSettings: true);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            ok ? 'menu.import_success'.tr() : 'menu.import_error'.tr(),
+          ),
+          backgroundColor: ok ? Colors.green : Colors.red,
+        ),
+      );
+      if (!ok) return;
+      ref
+          .read(settingsControllerProvider.notifier)
+          .updateIsFirstTime(isFirstTime: false);
+      router.go(Routes.home.route);
+    }
+
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
@@ -102,11 +131,11 @@ class OnboardingScreen extends HookConsumerWidget {
                         Expanded(
                           child: PageView(
                             controller: pageController,
-                            onPageChanged: (page) =>
-                                currentPage.value = page,
+                            onPageChanged: (page) => currentPage.value = page,
                             children: [
                               IntroPage(
                                 onGetStarted: goToNextPage,
+                                onRestore: restoreBackup,
                                 pageOffset: pageOffset,
                               ),
                               ColorSchemePage(pageOffset: pageOffset),

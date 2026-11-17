@@ -1,7 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +12,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../config/router_config.dart';
 import '../providers/settings_controller.dart';
 import '../providers/subs_controller.dart';
+import '../services/export_formats.dart';
+import '../utils/backup_file.dart';
 import 'add_subs_dialog.dart';
 
 class SidebarMenu extends ConsumerStatefulWidget {
@@ -95,28 +97,62 @@ class _MenubarState extends ConsumerState<SidebarMenu> {
     }
   }
 
+  /// Shares [content] as a file; [messenger] is captured before the drawer
+  /// closes, since this widget is gone by the time sharing finishes.
+  Future<void> _shareFile(
+    ScaffoldMessengerState messenger,
+    String fileName,
+    String content,
+  ) async {
+    try {
+      final file = File('${Directory.systemTemp.path}/$fileName');
+      await file.writeAsString(content);
+      await SharePlus.instance.share(ShareParams(files: [XFile(file.path)]));
+    } catch (_) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('menu.export_error_generic'.tr()),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _exportCsv() {
+    final messenger = ScaffoldMessenger.of(context);
+    final subs = ref.read(subsControllerProvider).value ?? [];
+    final settings = ref.read(settingsControllerProvider).value;
+    if (settings == null) return;
+    final now = DateTime.now();
+    unawaited(
+      _shareFile(
+        messenger,
+        'subscriptions_${now.millisecondsSinceEpoch}.csv',
+        subsToCsv(subs, settings, now),
+      ),
+    );
+  }
+
+  void _exportCalendar() {
+    final messenger = ScaffoldMessenger.of(context);
+    final subs = ref.read(subsControllerProvider).value ?? [];
+    final now = DateTime.now();
+    unawaited(_shareFile(messenger, 'subscriptions.ics', subsToIcs(subs, now)));
+  }
+
   Future<void> _importSubscriptions() async {
     final controller = ref.read(subsControllerProvider.notifier);
     final messenger = ScaffoldMessenger.of(context);
     try {
-      const jsonType = XTypeGroup(
-        label: 'JSON',
-        extensions: ['json'],
-        mimeTypes: ['application/json'],
-        uniformTypeIdentifiers: ['public.json'],
-      );
-      final picked = await openFile(acceptedTypeGroups: [jsonType]);
+      final jsonString = await pickBackupFile();
 
-      if (picked != null) {
-        final jsonString = await picked.readAsString();
+      if (jsonString != null) {
         final success = await controller.importFromJson(jsonString);
 
         messenger.showSnackBar(
           SnackBar(
             content: Text(
-              success
-                  ? 'menu.import_success'.tr()
-                  : 'menu.import_error'.tr(),
+              success ? 'menu.import_success'.tr() : 'menu.import_error'.tr(),
             ),
             backgroundColor: success ? Colors.green : Colors.red,
           ),
@@ -212,14 +248,18 @@ class _MenubarState extends ConsumerState<SidebarMenu> {
                   children: [
                     CircleAvatar(
                       radius: 24,
-                      child: ClipOval(child: Image.asset('assets/App_Logo.png', width: 48, height: 48)),
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/App_Logo.png',
+                          width: 48,
+                          height: 48,
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Text(
                       'settings.app_name'.tr(),
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineSmall
+                      style: Theme.of(context).textTheme.headlineSmall
                           ?.copyWith(color: colorScheme.onPrimary),
                     ),
                   ],
@@ -270,6 +310,22 @@ class _MenubarState extends ConsumerState<SidebarMenu> {
                 onTap: () {
                   Navigator.of(context).pop();
                   _exportSubscriptions();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.table_chart_outlined),
+                title: Text('menu.export_csv'.tr()),
+                onTap: () {
+                  _exportCsv();
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.event_outlined),
+                title: Text('menu.export_calendar'.tr()),
+                onTap: () {
+                  _exportCalendar();
+                  Navigator.of(context).pop();
                 },
               ),
               ListTile(

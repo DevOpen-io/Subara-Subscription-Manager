@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PageDots extends StatelessWidget {
-  const PageDots({
-    super.key,
-    required this.count,
-    required this.currentIndex,
-  });
+  const PageDots({super.key, required this.count, required this.currentIndex});
 
   final int count;
   final int currentIndex;

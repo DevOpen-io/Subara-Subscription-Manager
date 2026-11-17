@@ -7,6 +7,7 @@ import 'config/router_config.dart';
 import 'providers/settings_controller.dart';
 import 'providers/theme_provider.dart';
 import 'utils/notification_service.dart';
+import 'widgets/app_lock_gate.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,6 +51,8 @@ class MyApp extends ConsumerWidget {
       theme: light,
       darkTheme: dark,
       themeMode: themeMode,
+      builder: (context, child) =>
+          AppLockGate(child: child ?? const SizedBox.shrink()),
     );
   }
 }

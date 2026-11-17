@@ -1,8 +1,16 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:subs_tracker/models/settings_view_model.dart';
 import 'package:subs_tracker/models/sub_slice.dart';
+import 'package:subs_tracker/providers/settings_controller.dart';
 import 'package:subs_tracker/providers/subs_controller.dart';
+import 'package:subs_tracker/utils/notification_service.dart';
+
+import '../helpers/fake_notification_service.dart';
 
 // Create a testable subclass that bypasses persistence
 class TestSubsController extends SubsController {
@@ -10,8 +18,14 @@ class TestSubsController extends SubsController {
   Future<List<SubSlice>> build() async {
     // Skip persistence and just return empty list initially
     // We still want to trigger scheduleNotification if needed, but for unit test we might want to verify it's called.
-    return []; 
+    return [];
   }
+}
+
+class FakeSettingsController extends SettingsController {
+  @override
+  FutureOr<SettingsViewModel> build() =>
+      const SettingsViewModel(theme: ThemeMode.light, currency: Currency.usd);
 }
 
 void main() {
@@ -19,21 +33,23 @@ void main() {
 
   setUp(() {
     // Mock Notification Channel to prevent crash
-    const notificationChannel =
-        MethodChannel('dexterous.com/flutter/local_notifications');
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(
-      notificationChannel,
-      (methodCall) async {
-        return null;
-      },
+    const notificationChannel = MethodChannel(
+      'dexterous.com/flutter/local_notifications',
     );
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(notificationChannel, (methodCall) async {
+          return null;
+        });
   });
 
   test('SubsController adds a slice and updates state', () async {
     final container = ProviderContainer(
       overrides: [
         subsControllerProvider.overrideWith(TestSubsController.new),
+        settingsControllerProvider.overrideWith(FakeSettingsController.new),
+        notificationServiceProvider.overrideWithValue(
+          FakeNotificationService(),
+        ),
       ],
     );
 
@@ -62,6 +78,10 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         subsControllerProvider.overrideWith(TestSubsController.new),
+        settingsControllerProvider.overrideWith(FakeSettingsController.new),
+        notificationServiceProvider.overrideWithValue(
+          FakeNotificationService(),
+        ),
       ],
     );
 
@@ -77,13 +97,15 @@ void main() {
 
     // Add then remove
     container.read(subsControllerProvider.notifier).addSlice(slice);
-    
+
     // Verify add worked
     final added = await container.read(subsControllerProvider.future);
     expect(added, hasLength(1));
-    
-    container.read(subsControllerProvider.notifier).removeAt(0);
-    
+
+    container
+        .read(subsControllerProvider.notifier)
+        .removeSlice(added.single.id);
+
     final updated = await container.read(subsControllerProvider.future);
     expect(updated, isEmpty);
   });

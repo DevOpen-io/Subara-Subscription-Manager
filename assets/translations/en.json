@@ -19,7 +19,28 @@
 		"app_name": "Subara",
 		"notifications_title": "Notifications",
 		"notify_due_today": "Due today reminders",
-		"notify_due_tomorrow": "Due tomorrow reminders"
+		"notify_due_tomorrow": "Due tomorrow reminders",
+		"reminder_time": "Reminder time",
+		"exact_reminders": "Exact reminder time",
+		"exact_reminders_on": "Reminders arrive at the time you chose.",
+		"exact_reminders_off": "Android may deliver reminders up to an hour late.",
+		"exchange_rates": "Exchange rates",
+		"exchange_rates_none": "None set",
+		"exchange_rates_count": {
+			"one": "1 rate",
+			"other": "{} rates"
+		},
+		"exchange_rates_hint": "You enter the rates; they're never downloaded.",
+		"budget": "Monthly budget",
+		"budget_none": "Not set",
+		"budget_title": "Monthly budget",
+		"budget_hint": "You'll see how close your subscriptions are to it.",
+		"budget_invalid": "Enter a number greater than 0",
+		"budget_remove": "Remove",
+		"security": "Security",
+		"app_lock": "App lock",
+		"app_lock_desc": "Ask for your fingerprint, face or screen lock to open the app.",
+		"app_lock_unsupported": "Set up a screen lock on this device first."
 	},
 	"home": {
 		"no_subs": "Subscription Data Not Added Yet.",
@@ -47,7 +68,24 @@
 		"sort_amount_desc": "Amount (high to low)",
 		"total_spending_yearly": "Total Yearly Spending",
 		"view_monthly": "Monthly",
-		"view_yearly": "Yearly"
+		"view_yearly": "Yearly",
+		"upcoming_title": "Next 7 days",
+		"upcoming_count": {
+			"zero": "No payments",
+			"one": "1 payment",
+			"other": "{} payments"
+		},
+		"missing_rates": "{} isn't in the total. Add an exchange rate in Settings.",
+		"search_hint": "Search subscriptions",
+		"no_matches": "No subscriptions match",
+		"budget": "{} of {} budget",
+		"over_budget": "{} over budget",
+		"unpaid": "Unpaid",
+		"overdue": "Overdue",
+		"archive": "Archive ({})",
+		"archive_title": "Archive",
+		"archive_hint": "Cancelled subscriptions. Open one to reactivate it.",
+		"archive_saved": "saved {}"
 	},
 	"frequency": {
 		"daily": "Daily",
@@ -59,6 +97,36 @@
 			"weekly": "/wk",
 			"monthly": "/mo",
 			"yearly": "/yr"
+		},
+		"every": {
+			"daily": "Every {} days",
+			"weekly": "Every {} weeks",
+			"monthly": "Every {} months",
+			"yearly": "Every {} years"
+		},
+		"short_every": {
+			"daily": "/{} days",
+			"weekly": "/{} wk",
+			"monthly": "/{} mo",
+			"yearly": "/{} yr"
+		},
+		"unit": {
+			"daily": {
+				"one": "day",
+				"other": "days"
+			},
+			"weekly": {
+				"one": "week",
+				"other": "weeks"
+			},
+			"monthly": {
+				"one": "month",
+				"other": "months"
+			},
+			"yearly": {
+				"one": "year",
+				"other": "years"
+			}
 		}
 	},
 	"intro": {
@@ -136,7 +204,8 @@
 		"or_enter_manually": "OR ENTER MANUALLY",
 		"note_label": "Note",
 		"status_label": "Status",
-		"trial_ends_label": "Trial ends"
+		"trial_ends_label": "Trial ends",
+		"repeat_label": "Repeats"
 	},
 	"menu": {
 		"main_menu": "Main Menu",
@@ -167,7 +236,9 @@
 		"import_confirm_action": "Import",
 		"subscriptions": "Subscriptions",
 		"calendar": "Calendar",
-		"analytics": "Analytics"
+		"analytics": "Analytics",
+		"export_csv": "Export as CSV",
+		"export_calendar": "Add to calendar (.ics)"
 	},
 	"analytics": {
 		"no_data": "No subscription data to analyze yet.",
@@ -186,19 +257,19 @@
 		"period_year": "Year",
 		"chart_title": "Spend Overview",
 		"chart_mode_amount": "Amount",
-		"chart_mode_share": "Share"
-	},
-	"frequency_names": {
-		"daily": "DAILY",
-		"weekly": "WEEKLY",
-		"monthly": "MONTHLY",
-		"yearly": "YEARLY"
+		"chart_mode_share": "Share",
+		"saved_total": "Saved by cancelling",
+		"by_payment_method": "By payment method",
+		"method_not_set": "Not set",
+		"subs_count": {
+			"one": "1 subscription",
+			"other": "{} subscriptions"
+		}
 	},
 	"detail": {
 		"back": "Subs",
 		"active": "Active",
 		"cost": "COST",
-		"per_frequency": "per {}",
 		"next_charge": "NEXT CHARGE",
 		"in_days": "in {} days",
 		"today": "today",
@@ -214,8 +285,6 @@
 		"reminder": "Reminder",
 		"reminder_none": "Off",
 		"reminder_onDay": "On day",
-		"reminder_dayBefore": "Day before",
-		"reminder_both": "All",
 		"not_set": "—",
 		"delete": "Delete Subscription",
 		"delete_confirm": "Are you sure you want to delete {}?",
@@ -229,6 +298,75 @@
 		"status_freeTrial": "Free Trial",
 		"status_paused": "Paused",
 		"status_cancelled": "Cancelled",
-		"trial_ends": "Trial ends"
+		"trial_ends": "Trial ends",
+		"reminder_days_before": {
+			"one": "1 day before",
+			"other": "{} days before"
+		},
+		"reminder_when": "When to remind",
+		"reminder_how_early": "How early",
+		"manage_link": "Manage link",
+		"manage_hint": "netflix.com/account",
+		"manage_invalid": "Enter a valid web address",
+		"manage_open": "Manage subscription",
+		"manage_open_failed": "Couldn't open the link",
+		"manage_remove": "Remove",
+		"saved": "SAVED",
+		"saved_since": "since {}",
+		"currency": "Currency",
+		"currency_main": "Main currency ({})",
+		"section_price_changes": "PRICE CHANGES",
+		"price_change_delete_title": "Remove price change?",
+		"price_change_delete_body": "Use this if the price was entered by mistake. Past payments will show the next price instead.",
+		"shared_with": "Shared with",
+		"shared_just_me": "Just me",
+		"shared_people": {
+			"one": "1 person",
+			"other": "{} people"
+		},
+		"your_share": "your share {}",
+		"payment_method_hint": "e.g. Credit card",
+		"auto_renew": "Renews automatically",
+		"payment_due": "Payment due {}",
+		"payment_overdue": "Overdue since {}",
+		"mark_paid": "Mark paid",
+		"category_add": "New category",
+		"category_remove": "Remove category",
+		"category_hint": "e.g. Insurance",
+		"snooze": "Snooze reminders",
+		"snooze_week": "1 week",
+		"snooze_month": "1 month",
+		"snooze_resume": "Resume",
+		"snoozed_until": "Snoozed until {}"
+	},
+	"notifications": {
+		"title": "Subscription Reminder",
+		"due_today": "Your {} subscription is due today.",
+		"due_tomorrow": "Your {} subscription is due tomorrow.",
+		"trial_ends_today": "Your {} free trial ends today.",
+		"trial_ends_tomorrow": "Your {} free trial ends tomorrow.",
+		"due_in_days": "Your {} subscription renews in {} days.",
+		"trial_ends_in_days": "Your {} free trial ends in {} days.",
+		"overdue": "Your {} payment is overdue. Mark it paid once you have paid.",
+		"mark_paid": "Paid"
+	},
+	"rates": {
+		"title": "Exchange rate",
+		"equals": "1 {} =",
+		"invalid": "Enter a number greater than 0",
+		"remove": "Remove"
+	},
+	"lock": {
+		"title": "Subara is locked",
+		"unlock": "Unlock",
+		"reason": "Unlock Subara"
+	},
+	"payment_methods": {
+		"credit_card": "Credit card",
+		"debit_card": "Debit card",
+		"paypal": "PayPal",
+		"apple_pay": "Apple Pay",
+		"google_pay": "Google Pay",
+		"bank_transfer": "Bank transfer"
 	}
 }

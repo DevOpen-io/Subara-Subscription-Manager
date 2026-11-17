@@ -15,17 +15,23 @@ class WidgetUpdateService {
   ) {
     final subs = allSubs.activeOnly;
     final subsJson = subs
-        .map((s) => {
-              'name': s.name,
-              'amount': s.amount,
-              'monthlyAmount': s.monthlyAmount,
-              'startDate': s.startDate.toIso8601String(),
-              'frequency': s.frequency.name,
-              'color': s.color,
-            })
+        .map(
+          (s) => {
+            'name': s.name,
+            'amount': s.amount,
+            'monthlyAmount': s.monthlyAmount,
+            'startDate': s.startDate.toIso8601String(),
+            'frequency': s.frequency.name,
+            'interval': s.period,
+            'color': s.color,
+          },
+        )
         .toList();
 
-    final monthlyTotal = subs.fold<double>(0, (sum, s) => sum + s.monthlyAmount);
+    final monthlyTotal = subs.fold<double>(
+      0,
+      (sum, s) => sum + s.monthlyAmount,
+    );
 
     return {
       'subs': subsJson,
@@ -41,15 +47,18 @@ class WidgetUpdateService {
       await Future.wait([
         HomeWidget.updateWidget(
           iOSName: 'MonthlySpendWidget',
-          qualifiedAndroidName: 'io.devopen.subzilla.widget.MonthlySpendWidgetReceiver',
+          qualifiedAndroidName:
+              'io.devopen.subzilla.widget.MonthlySpendWidgetReceiver',
         ),
         HomeWidget.updateWidget(
           iOSName: 'NextDueWidget',
-          qualifiedAndroidName: 'io.devopen.subzilla.widget.NextDueWidgetReceiver',
+          qualifiedAndroidName:
+              'io.devopen.subzilla.widget.NextDueWidgetReceiver',
         ),
         HomeWidget.updateWidget(
           iOSName: 'UpcomingWidget',
-          qualifiedAndroidName: 'io.devopen.subzilla.widget.UpcomingWidgetReceiver',
+          qualifiedAndroidName:
+              'io.devopen.subzilla.widget.UpcomingWidgetReceiver',
         ),
       ]);
     } catch (_) {

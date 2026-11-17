@@ -6,22 +6,22 @@ import 'package:flutter/material.dart';
 const Color kCoralAccent = Color(0xFFD83434);
 
 const List<(FlexScheme, String)> kCuratedSchemes = [
-  (FlexScheme.bahamaBlue,  'Bahama Blue'),
-  (FlexScheme.blue,        'Blue'),
-  (FlexScheme.indigo,      'Indigo'),
-  (FlexScheme.hippieBlue,  'Hippie Blue'),
-  (FlexScheme.aquaBlue,    'Aqua Blue'),
-  (FlexScheme.deepPurple,  'Deep Purple'),
-  (FlexScheme.purpleM3,    'Purple'),
-  (FlexScheme.pinkM3,      'Pink'),
-  (FlexScheme.sakura,      'Sakura'),
-  (FlexScheme.mandyRed,    'Red'),
-  (FlexScheme.orangeM3,    'Orange'),
-  (FlexScheme.amber,       'Amber'),
-  (FlexScheme.greenM3,     'Green'),
-  (FlexScheme.tealM3,      'Teal'),
-  (FlexScheme.blueWhale,   'Blue Whale'),
-  (FlexScheme.espresso,    'Espresso'),
+  (FlexScheme.bahamaBlue, 'Bahama Blue'),
+  (FlexScheme.blue, 'Blue'),
+  (FlexScheme.indigo, 'Indigo'),
+  (FlexScheme.hippieBlue, 'Hippie Blue'),
+  (FlexScheme.aquaBlue, 'Aqua Blue'),
+  (FlexScheme.deepPurple, 'Deep Purple'),
+  (FlexScheme.purpleM3, 'Purple'),
+  (FlexScheme.pinkM3, 'Pink'),
+  (FlexScheme.sakura, 'Sakura'),
+  (FlexScheme.mandyRed, 'Red'),
+  (FlexScheme.orangeM3, 'Orange'),
+  (FlexScheme.amber, 'Amber'),
+  (FlexScheme.greenM3, 'Green'),
+  (FlexScheme.tealM3, 'Teal'),
+  (FlexScheme.blueWhale, 'Blue Whale'),
+  (FlexScheme.espresso, 'Espresso'),
 ];
 
 String schemeDisplayName(FlexScheme scheme) {

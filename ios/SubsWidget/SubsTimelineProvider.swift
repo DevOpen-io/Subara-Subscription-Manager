@@ -53,7 +53,8 @@ struct SubsTimelineProvider: TimelineProvider {
         let subsWithDates: [(WidgetSubEntry, Date)] = data.subs.compactMap { sub in
             guard let freq = SubFrequency(rawValue: sub.frequency),
                   let start = parseDate(sub.startDate) else { return nil }
-            let nextDate = NextDueDateHelper.nextDueDate(startDate: start, frequency: freq, from: day)
+            let nextDate = NextDueDateHelper.nextDueDate(
+                startDate: start, frequency: freq, from: day, interval: sub.interval ?? 1)
             return (sub, nextDate)
         }.sorted { $0.1 < $1.1 }
 

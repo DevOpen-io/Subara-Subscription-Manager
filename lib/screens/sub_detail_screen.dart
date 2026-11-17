@@ -5,100 +5,138 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../models/billing.dart';
+import '../models/categories.dart';
+import '../models/money.dart';
+import '../models/settings_view_model.dart';
 import '../models/sub_slice.dart';
 import '../providers/settings_controller.dart';
 import '../providers/subs_controller.dart';
+import '../utils/billing_labels.dart';
 import '../utils/color_palette.dart';
+import '../utils/manage_url.dart';
+import '../utils/payment_methods.dart';
 import '../widgets/brand_logo.dart';
+import '../widgets/exchange_rate_dialog.dart';
 import '../widgets/status_picker.dart';
 
 // ---------------------------------------------------------------------------
 // Helper functions
 // ---------------------------------------------------------------------------
 
-DateTime _advanceByFrequency(DateTime date, Frequency frequency) {
-  switch (frequency) {
-    case Frequency.daily:
-      return date.add(const Duration(days: 1));
-    case Frequency.weekly:
-      return date.add(const Duration(days: 7));
-    case Frequency.monthly:
-      var month = date.month + 1;
-      var year = date.year;
-      if (month > 12) {
-        month = 1;
-        year++;
-      }
-      final maxDay = DateTime(year, month + 1, 0).day;
-      return DateTime(year, month, date.day.clamp(1, maxDay));
-    case Frequency.yearly:
-      final nextYear = date.year + 1;
-      final maxDay = DateTime(nextYear, date.month + 1, 0).day;
-      return DateTime(nextYear, date.month, date.day.clamp(1, maxDay));
-  }
-}
+/// `paid` is null for auto-renewing subscriptions (always paid).
+typedef _Payment = ({DateTime date, double amount, String symbol, bool? paid});
 
-DateTime _nextChargeDate(SubSlice slice) {
-  final now = DateTime.now();
-  var date = slice.startDate;
-  while (!date.isAfter(now)) {
-    date = _advanceByFrequency(date, slice.frequency);
-  }
-  return date;
-}
-
-List<(DateTime, double)> _paymentHistory(SubSlice slice, {int limit = 4}) {
-  final now = DateTime.now();
-  final history = <DateTime>[];
-  var current = slice.startDate;
-  while (!current.isAfter(now)) {
-    history.add(current);
-    current = _advanceByFrequency(current, slice.frequency);
-    if (history.length > limit) history.removeAt(0);
-  }
-  return history.reversed
-      .take(limit)
-      .map((d) => (d, slice.amount))
-      .toList();
-}
+/// Recent charges with the price (and currency) in force on each.
+List<_Payment> _paymentHistory(SubSlice slice, Currency main) => [
+  for (final p in slice.paymentHistory(DateTime.now()))
+    (
+      date: p.date,
+      amount: p.amount,
+      symbol: (p.currency ?? main).symbol,
+      paid: slice.autoRenew ? null : slice.isPaid(p.date),
+    ),
+];
 
 // ---------------------------------------------------------------------------
 // Picker helpers
 // ---------------------------------------------------------------------------
 
+/// Two wheels: "every N" and the period unit, saved as they change.
 void _showFrequencyPicker(
   BuildContext context,
   SubSlice draft,
   void Function(SubSlice) onUpdate,
 ) {
   const frequencies = Frequency.values;
-  final initialIndex = frequencies.indexOf(draft.frequency);
+  var current = draft;
 
   showCupertinoModalPopup<void>(
     context: context,
     builder: (ctx) {
       final theme = Theme.of(ctx);
-      return Container(
-        height: 250,
-        color: theme.colorScheme.surface,
-        child: CupertinoPicker(
-          itemExtent: 40,
-          scrollController: FixedExtentScrollController(initialItem: initialIndex),
-          onSelectedItemChanged: (i) {
-            final updated = draft.copyWith(frequency: frequencies[i]);
-            onUpdate(updated);
-          },
-          children: frequencies.map((f) {
-            final key = f.name.toLowerCase();
-            return Center(
-              child: Text(
-                'frequency.$key'.tr(),
-                style: TextStyle(color: theme.colorScheme.onSurface),
+      final textStyle = TextStyle(color: theme.colorScheme.onSurface);
+      return StatefulBuilder(
+        builder: (ctx, setState) {
+          void update(SubSlice next) {
+            setState(() => current = next);
+            onUpdate(next);
+          }
+
+          return Container(
+            height: 290,
+            color: theme.colorScheme.surface,
+            child: SafeArea(
+              top: false,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16, bottom: 4),
+                    child: Text(
+                      current.cycleLabel,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: CupertinoPicker(
+                            itemExtent: 40,
+                            scrollController: FixedExtentScrollController(
+                              initialItem:
+                                  current.period.clamp(
+                                    1,
+                                    SubSlice.maxInterval,
+                                  ) -
+                                  1,
+                            ),
+                            onSelectedItemChanged: (i) =>
+                                update(current.copyWith(interval: i + 1)),
+                            children: List.generate(
+                              SubSlice.maxInterval,
+                              (i) => Center(
+                                child: Text('${i + 1}', style: textStyle),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: CupertinoPicker(
+                            itemExtent: 40,
+                            scrollController: FixedExtentScrollController(
+                              initialItem: frequencies.indexOf(
+                                current.frequency,
+                              ),
+                            ),
+                            onSelectedItemChanged: (i) => update(
+                              current.copyWith(frequency: frequencies[i]),
+                            ),
+                            children: [
+                              for (final f in frequencies)
+                                Center(
+                                  child: Text(
+                                    'frequency.unit.${f.name}'.plural(
+                                      current.period,
+                                    ),
+                                    style: textStyle,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            );
-          }).toList(),
-        ),
+            ),
+          );
+        },
       );
     },
   );
@@ -133,7 +171,6 @@ Future<void> _confirmDelete(
   BuildContext context,
   WidgetRef ref,
   SubSlice liveSlice,
-  int index,
 ) async {
   await showCupertinoDialog<void>(
     context: context,
@@ -148,7 +185,7 @@ Future<void> _confirmDelete(
         CupertinoDialogAction(
           isDestructiveAction: true,
           onPressed: () {
-            ref.read(subsControllerProvider.notifier).removeAt(index);
+            ref.read(subsControllerProvider.notifier).removeSlice(liveSlice.id);
             Navigator.of(ctx).pop();
             if (context.mounted) context.pop();
           },
@@ -190,7 +227,9 @@ void _showColorPicker(
                       onColorChanged: (c) => setS(() => temp = c),
                       enableAlpha: false,
                       labelTypes: const [],
-                      pickerAreaBorderRadius: const BorderRadius.all(Radius.circular(12)),
+                      pickerAreaBorderRadius: const BorderRadius.all(
+                        Radius.circular(12),
+                      ),
                     ),
                   ),
                   actions: [
@@ -229,7 +268,9 @@ void _showColorPicker(
                     width: 32,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                      color: theme.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.4,
+                      ),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -252,7 +293,8 @@ void _showColorPicker(
                     spacing: 10,
                     runSpacing: 10,
                     children: kSliceColors.map((c) {
-                      final isSelected = c.toARGB32() == currentColor.toARGB32();
+                      final isSelected =
+                          c.toARGB32() == currentColor.toARGB32();
                       return GestureDetector(
                         onTap: () {
                           setSheetState(() => currentColor = c);
@@ -275,7 +317,9 @@ void _showColorPicker(
                             boxShadow: [
                               if (isSelected)
                                 BoxShadow(
-                                  color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                                  color: theme.colorScheme.primary.withValues(
+                                    alpha: 0.25,
+                                  ),
                                   blurRadius: 12,
                                   offset: const Offset(0, 4),
                                 ),
@@ -287,7 +331,10 @@ void _showColorPicker(
                                   color: Colors.white,
                                   size: 20,
                                   shadows: [
-                                    Shadow(color: Colors.black45, blurRadius: 2),
+                                    Shadow(
+                                      color: Colors.black45,
+                                      blurRadius: 2,
+                                    ),
                                   ],
                                 )
                               : null,
@@ -304,7 +351,9 @@ void _showColorPicker(
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: openCustom,
-                          icon: Icon(isCustom ? Icons.check_circle : Icons.colorize),
+                          icon: Icon(
+                            isCustom ? Icons.check_circle : Icons.colorize,
+                          ),
                           label: Text(
                             isCustom
                                 ? 'dialogs.custom_color_selected'.tr()
@@ -316,7 +365,9 @@ void _showColorPicker(
                                     color: theme.colorScheme.primary,
                                     width: 2,
                                   ),
-                                  backgroundColor: theme.colorScheme.primaryContainer
+                                  backgroundColor: theme
+                                      .colorScheme
+                                      .primaryContainer
                                       .withValues(alpha: 0.3),
                                 )
                               : null,
@@ -335,14 +386,8 @@ void _showColorPicker(
   );
 }
 
-const _kCategories = [
-  'Streaming', 'Music', 'Cloud', 'Productivity', 'Fitness', 'Gaming',
-  'AI', 'Education', 'Security', 'Health', 'Transport', 'Food', 'Shopping',
-  'Dating', 'Career', 'Social', 'Reading', 'News', 'Books', 'Developer',
-  'Design', 'Marketing', 'E-commerce', 'Website', 'Lifestyle', 'Pet',
-  'Beauty', 'Fashion', 'Sports', 'Bundle', 'Other',
-];
-
+/// Built-in and user categories; users can add new ones and remove their
+/// own (long list, so a scrollable sheet).
 void _showCategoryPicker(
   BuildContext context,
   String? current,
@@ -355,100 +400,606 @@ void _showCategoryPicker(
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
-    builder: (sheetCtx) {
-      final theme = Theme.of(sheetCtx);
-      return DraggableScrollableSheet(
-        initialChildSize: 0.55,
-        minChildSize: 0.4,
-        maxChildSize: 0.85,
-        expand: false,
-        builder: (_, controller) => Column(
-          children: [
-            const SizedBox(height: 12),
-            Center(
-              child: Container(
-                width: 32,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                  borderRadius: BorderRadius.circular(2),
+    builder: (sheetCtx) => _CategorySheet(
+      current: current,
+      onSelected: (cat) {
+        Navigator.of(sheetCtx).pop();
+        onSelected(cat);
+      },
+    ),
+  );
+}
+
+class _CategorySheet extends ConsumerWidget {
+  const _CategorySheet({required this.current, required this.onSelected});
+
+  final String? current;
+  final ValueChanged<String?> onSelected;
+
+  Future<void> _addCategory(BuildContext context, WidgetRef ref) async {
+    final name = await showDialog<String>(
+      context: context,
+      builder: (_) => const _NewCategoryDialog(),
+    );
+    if (name == null) return;
+    // An existing (or built-in) name isn't added again, just selected.
+    ref.read(settingsControllerProvider.notifier).addCategory(name);
+    onSelected(name.trim());
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final custom =
+        ref.watch(settingsControllerProvider).value?.customCategories ??
+        const <String>[];
+    final all = [...builtInCategories, ...custom];
+    return DraggableScrollableSheet(
+      initialChildSize: 0.55,
+      minChildSize: 0.4,
+      maxChildSize: 0.85,
+      expand: false,
+      builder: (_, controller) => Column(
+        children: [
+          const SizedBox(height: 12),
+          Center(
+            child: Container(
+              width: 32,
+              height: 4,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.4,
                 ),
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Align(
-                alignment: Alignment.centerLeft,
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'detail.category'.tr(),
+                    style: theme.textTheme.titleSmall,
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () => _addCategory(context, ref),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: Text('detail.category_add'.tr()),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              controller: controller,
+              itemCount: all.length,
+              itemBuilder: (_, i) {
+                final cat = all[i];
+                final isCustom = i >= builtInCategories.length;
+                final isSelected = cat == current;
+                return ListTile(
+                  title: Text(cat),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isSelected)
+                        Icon(Icons.check, color: theme.colorScheme.primary),
+                      if (isCustom)
+                        IconButton(
+                          tooltip: 'detail.category_remove'.tr(),
+                          icon: const Icon(Icons.delete_outline),
+                          onPressed: () => ref
+                              .read(settingsControllerProvider.notifier)
+                              .removeCategory(cat),
+                        ),
+                    ],
+                  ),
+                  onTap: () => onSelected(cat == current ? null : cat),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NewCategoryDialog extends HookWidget {
+  const _NewCategoryDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = useTextEditingController();
+    void save() {
+      if (controller.text.trim().isEmpty) return;
+      Navigator.of(context).pop(controller.text);
+    }
+
+    return AlertDialog.adaptive(
+      title: Text('detail.category_add'.tr()),
+      content: Material(
+        type: MaterialType.transparency,
+        child: TextField(
+          controller: controller,
+          autofocus: true,
+          textCapitalization: TextCapitalization.sentences,
+          maxLength: 30,
+          decoration: InputDecoration(hintText: 'detail.category_hint'.tr()),
+          onSubmitted: (_) => save(),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text('dialogs.cancel'.tr()),
+        ),
+        FilledButton(onPressed: save, child: Text('common.save'.tr())),
+      ],
+    );
+  }
+}
+
+const _reminderDayOptions = [1, 3, 7];
+
+/// Reminder mode plus how many days ahead the "before" reminder fires.
+void _showReminderPicker(
+  BuildContext context,
+  SubSlice draft,
+  void Function(SubSlice) onUpdate,
+) {
+  var current = draft;
+  showModalBottomSheet<void>(
+    context: context,
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, setState) {
+        final theme = Theme.of(ctx);
+        void update(SubSlice next) {
+          setState(() => current = next);
+          onUpdate(next);
+        }
+
+        final hasBefore =
+            current.reminderMode == ReminderMode.dayBefore ||
+            current.reminderMode == ReminderMode.both;
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
                 child: Text(
-                  'detail.category'.tr(),
-                  style: theme.textTheme.titleSmall,
+                  'detail.reminder_when'.tr(),
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: ListView.builder(
-                controller: controller,
-                itemCount: _kCategories.length,
-                itemBuilder: (_, i) {
-                  final cat = _kCategories[i];
-                  final isSelected = cat == current;
-                  return ListTile(
-                    title: Text(cat),
-                    trailing: isSelected
-                        ? Icon(Icons.check, color: theme.colorScheme.primary)
-                        : null,
-                    onTap: () {
-                      Navigator.of(sheetCtx).pop();
-                      onSelected(cat == current ? null : cat);
-                    },
-                  );
-                },
+              for (final mode in ReminderMode.values)
+                _ReminderModeTile(
+                  label: switch (mode) {
+                    ReminderMode.none => 'detail.reminder_none'.tr(),
+                    ReminderMode.onDay => 'detail.reminder_onDay'.tr(),
+                    ReminderMode.dayBefore => daysBeforeLabel(
+                      current.daysBefore,
+                    ),
+                    ReminderMode.both =>
+                      current
+                          .copyWith(reminderMode: ReminderMode.both)
+                          .reminderLabel,
+                  },
+                  selected: mode == current.reminderMode,
+                  onTap: () => update(current.copyWith(reminderMode: mode)),
+                ),
+              _SnoozeRow(
+                snoozedUntil: current.remindersSnoozedUntil,
+                onSnooze: (until) =>
+                    update(current.copyWith(remindersSnoozedUntil: until)),
               ),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOut,
+                child: hasBefore
+                    ? Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                        child: Row(
+                          children: [
+                            Text(
+                              'detail.reminder_how_early'.tr(),
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                            const Spacer(),
+                            SegmentedButton<int>(
+                              showSelectedIcon: false,
+                              segments: [
+                                for (final d in _reminderDayOptions)
+                                  ButtonSegment(value: d, label: Text('$d')),
+                              ],
+                              selected: {current.daysBefore},
+                              emptySelectionAllowed: true,
+                              onSelectionChanged: (s) {
+                                if (s.isEmpty) return;
+                                update(
+                                  current.copyWith(remindDaysBefore: s.first),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      )
+                    : const SizedBox(width: double.infinity),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        );
+      },
+    ),
+  );
+}
+
+/// "Snooze 1 week / 1 month", or "Snoozed until … — Resume".
+class _SnoozeRow extends StatelessWidget {
+  const _SnoozeRow({required this.snoozedUntil, required this.onSnooze});
+
+  final DateTime? snoozedUntil;
+  final ValueChanged<DateTime?> onSnooze;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final now = DateTime.now();
+    final until = snoozedUntil;
+    final active = until != null && until.isAfter(now);
+    DateTime inDays(int d) => DateTime(now.year, now.month, now.day + d);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+      child: Row(
+        children: [
+          Icon(
+            Icons.snooze,
+            size: 20,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              active
+                  ? 'detail.snoozed_until'.tr(
+                      args: [
+                        DateFormat(
+                          'MMM d',
+                          context.locale.toString(),
+                        ).format(until),
+                      ],
+                    )
+                  : 'detail.snooze'.tr(),
+              style: theme.textTheme.bodyMedium,
+            ),
+          ),
+          if (active)
+            TextButton(
+              onPressed: () => onSnooze(null),
+              child: Text('detail.snooze_resume'.tr()),
+            )
+          else ...[
+            ActionChip(
+              label: Text('detail.snooze_week'.tr()),
+              visualDensity: VisualDensity.compact,
+              onPressed: () => onSnooze(inDays(7)),
+            ),
+            const SizedBox(width: 6),
+            ActionChip(
+              label: Text('detail.snooze_month'.tr()),
+              visualDensity: VisualDensity.compact,
+              onPressed: () => onSnooze(inDays(30)),
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ReminderModeTile extends StatelessWidget {
+  const _ReminderModeTile({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(label),
+      leading: selected
+          ? Icon(
+              Icons.radio_button_checked,
+              color: Theme.of(context).colorScheme.primary,
+            )
+          : const Icon(Icons.radio_button_unchecked),
+      onTap: onTap,
+    );
+  }
+}
+
+const _maxPeopleOption = 10;
+
+/// "Just me", "2 people", ... — how many split the cost.
+void _showSharedPicker(
+  BuildContext context,
+  SubSlice draft,
+  void Function(SubSlice) onUpdate,
+) {
+  showModalBottomSheet<void>(
+    context: context,
+    useRootNavigator: true,
+    isScrollControlled: true,
+    builder: (ctx) {
+      final theme = Theme.of(ctx);
+      return SafeArea(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.sizeOf(ctx).height * 0.6,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  'detail.shared_with'.tr(),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Flexible(
+                child: ListView.builder(
+                  itemCount: _maxPeopleOption,
+                  itemBuilder: (_, i) {
+                    final n = i + 1;
+                    return ListTile(
+                      title: Text(_sharedLabel(n)),
+                      trailing: n == draft.people
+                          ? Icon(Icons.check, color: theme.colorScheme.primary)
+                          : null,
+                      onTap: () {
+                        Navigator.of(ctx).pop();
+                        onUpdate(draft.copyWith(sharedWith: n));
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       );
     },
   );
 }
 
-void _showReminderModePicker(
+String _sharedLabel(int people) => people <= 1
+    ? 'detail.shared_just_me'.tr()
+    : 'detail.shared_people'.plural(people);
+
+/// Edits the manage/cancel link; only http(s) links are accepted.
+void _showManageUrlInput(
   BuildContext context,
-  ReminderMode current,
-  ValueChanged<ReminderMode> onSelected,
+  String? current,
+  ValueChanged<String?> onSelected,
 ) {
+  final controller = TextEditingController(text: current ?? '');
   showModalBottomSheet<void>(
     context: context,
-    builder: (ctx) => SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              'detail.reminder'.tr(),
-              style: Theme.of(ctx).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+    isScrollControlled: true,
+    builder: (ctx) {
+      String? error;
+      return StatefulBuilder(
+        builder: (ctx, setState) {
+          void save() {
+            final text = controller.text.trim();
+            if (text.isEmpty) {
+              Navigator.of(ctx).pop();
+              onSelected(null);
+              return;
+            }
+            final url = normalizeManageUrl(text);
+            if (url == null) {
+              setState(() => error = 'detail.manage_invalid'.tr());
+              return;
+            }
+            Navigator.of(ctx).pop();
+            onSelected(url);
+          }
+
+          return Padding(
+            padding: EdgeInsets.only(
+              left: 24,
+              right: 24,
+              top: 24,
+              bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
             ),
-          ),
-          ...ReminderMode.values.map(
-            (mode) => ListTile(
-              title: Text('detail.reminder_${mode.name}'.tr()),
-              leading: mode == current
-                  ? Icon(Icons.radio_button_checked, color: Theme.of(ctx).colorScheme.primary)
-                  : const Icon(Icons.radio_button_unchecked),
-              onTap: () {
-                Navigator.of(ctx).pop();
-                onSelected(mode);
-              },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'detail.manage_link'.tr(),
+                  style: Theme.of(ctx).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: controller,
+                  autofocus: true,
+                  keyboardType: TextInputType.url,
+                  autocorrect: false,
+                  decoration: InputDecoration(
+                    hintText: 'detail.manage_hint'.tr(),
+                    errorText: error,
+                    border: const OutlineInputBorder(),
+                  ),
+                  onSubmitted: (_) => save(),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    if (current != null)
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          onSelected(null);
+                        },
+                        child: Text('detail.manage_remove'.tr()),
+                      ),
+                    const Spacer(),
+                    FilledButton(
+                      onPressed: save,
+                      child: Text('common.save'.tr()),
+                    ),
+                  ],
+                ),
+              ],
             ),
+          );
+        },
+      );
+    },
+  ).whenComplete(controller.dispose);
+}
+
+/// Picks the billing currency; a foreign one without a rate asks for it
+/// right away, so the subscription can be counted in totals.
+void _pickCurrency(
+  BuildContext context,
+  WidgetRef ref,
+  SettingsViewModel settings,
+  SubSlice draft,
+  void Function(SubSlice) onUpdate,
+) {
+  final options = <Currency?>[null, ...Currency.values];
+  showModalBottomSheet<void>(
+    context: context,
+    useRootNavigator: true,
+    isScrollControlled: true,
+    builder: (sheetCtx) {
+      final theme = Theme.of(sheetCtx);
+      return SafeArea(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.sizeOf(sheetCtx).height * 0.7,
           ),
-          const SizedBox(height: 8),
-        ],
-      ),
-    ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  'detail.currency'.tr(),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Flexible(
+                child: ListView.builder(
+                  itemCount: options.length,
+                  itemBuilder: (_, i) {
+                    final c = options[i];
+                    return ListTile(
+                      title: Text(
+                        c == null
+                            ? 'detail.currency_main'.tr(
+                                args: [settings.currency.symbol],
+                              )
+                            : '${c.label} (${c.symbol})',
+                      ),
+                      trailing: c == draft.currency
+                          ? Icon(Icons.check, color: theme.colorScheme.primary)
+                          : null,
+                      onTap: () async {
+                        Navigator.of(sheetCtx).pop();
+                        // Same as main is stored as "follow main".
+                        final picked = c == settings.currency ? null : c;
+                        onUpdate(draft.copyWith(currency: picked));
+                        if (picked == null ||
+                            settings.hasRate(picked) ||
+                            !context.mounted) {
+                          return;
+                        }
+                        final edit = await showExchangeRateDialog(
+                          context,
+                          from: picked,
+                          main: settings.currency,
+                        );
+                        if (edit is RateSet) {
+                          ref
+                              .read(settingsControllerProvider.notifier)
+                              .setExchangeRate(picked, edit.rate);
+                        }
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
   );
+}
+
+Future<void> _confirmRemovePriceChange(
+  BuildContext context,
+  VoidCallback remove,
+) => showCupertinoDialog<void>(
+  context: context,
+  builder: (ctx) => CupertinoAlertDialog(
+    title: Text('detail.price_change_delete_title'.tr()),
+    content: Text('detail.price_change_delete_body'.tr()),
+    actions: [
+      CupertinoDialogAction(
+        onPressed: () => Navigator.of(ctx).pop(),
+        child: Text('detail.cancel'.tr()),
+      ),
+      CupertinoDialogAction(
+        isDestructiveAction: true,
+        onPressed: () {
+          remove();
+          Navigator.of(ctx).pop();
+        },
+        child: Text('detail.delete_action'.tr()),
+      ),
+    ],
+  ),
+);
+
+Future<void> _openManageUrl(BuildContext context, String? url) async {
+  final uri = safeManageUri(url);
+  final messenger = ScaffoldMessenger.of(context);
+  final opened =
+      uri != null &&
+      await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      ).catchError((Object _) => false);
+  if (!opened) {
+    messenger.showSnackBar(
+      SnackBar(content: Text('detail.manage_open_failed'.tr())),
+    );
+  }
 }
 
 void _showTrialEndPicker(
@@ -496,54 +1047,108 @@ void _showTrialEndPicker(
   });
 }
 
-void _showCardInput(BuildContext context, String? current, ValueChanged<String?> onSelected) {
-  final controller = TextEditingController(text: current ?? '');
+const _paymentSuggestionKeys = [
+  'credit_card',
+  'debit_card',
+  'paypal',
+  'apple_pay',
+  'google_pay',
+  'bank_transfer',
+];
+
+/// Payment method label (with suggestions) plus the card's last 4 digits.
+void _showPaymentInput(
+  BuildContext context,
+  SubSlice draft,
+  void Function(SubSlice) onUpdate,
+) {
+  final method = TextEditingController(text: draft.paymentMethod ?? '');
+  final card = TextEditingController(text: draft.cardLastFour ?? '');
+  String? clean(String v) => v.trim().isEmpty ? null : v.trim();
+  void save(BuildContext ctx) {
+    Navigator.of(ctx).pop();
+    onUpdate(
+      draft.copyWith(
+        paymentMethod: clean(method.text),
+        cardLastFour: clean(card.text),
+      ),
+    );
+  }
+
   showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     builder: (ctx) {
       return Padding(
         padding: EdgeInsets.only(
-          left: 24, right: 24, top: 24,
+          left: 24,
+          right: 24,
+          top: 24,
           bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('detail.card_hint'.tr(), style: Theme.of(ctx).textTheme.titleMedium),
+            Text(
+              'detail.payment_method'.tr(),
+              style: Theme.of(ctx).textTheme.titleMedium,
+            ),
             const SizedBox(height: 16),
             TextField(
-              controller: controller,
-              autofocus: true,
+              controller: method,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(
+                hintText: 'detail.payment_method_hint'.tr(),
+                border: const OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: [
+                for (final key in _paymentSuggestionKeys)
+                  ActionChip(
+                    label: Text('payment_methods.$key'.tr()),
+                    visualDensity: VisualDensity.compact,
+                    onPressed: () => method.text = 'payment_methods.$key'.tr(),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: card,
               keyboardType: TextInputType.number,
               maxLength: 4,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
+                labelText: 'detail.card_hint'.tr(),
                 hintText: '1234',
                 prefixText: '•••• ',
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
-              onSubmitted: (val) {
-                Navigator.of(ctx).pop();
-                onSelected(val.isEmpty ? null : val);
-              },
+              onSubmitted: (_) => save(ctx),
             ),
             const SizedBox(height: 8),
             FilledButton(
-              onPressed: () {
-                Navigator.of(ctx).pop();
-                onSelected(controller.text.isEmpty ? null : controller.text);
-              },
+              onPressed: () => save(ctx),
               child: Text('common.save'.tr()),
             ),
           ],
         ),
       );
     },
-  ).whenComplete(controller.dispose);
+  ).whenComplete(() {
+    method.dispose();
+    card.dispose();
+  });
 }
 
-void _showNoteInput(BuildContext context, String? current, ValueChanged<String?> onSelected) {
+void _showNoteInput(
+  BuildContext context,
+  String? current,
+  ValueChanged<String?> onSelected,
+) {
   final controller = TextEditingController(text: current ?? '');
   showModalBottomSheet<void>(
     context: context,
@@ -551,14 +1156,19 @@ void _showNoteInput(BuildContext context, String? current, ValueChanged<String?>
     builder: (ctx) {
       return Padding(
         padding: EdgeInsets.only(
-          left: 24, right: 24, top: 24,
+          left: 24,
+          right: 24,
+          top: 24,
           bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('detail.note'.tr(), style: Theme.of(ctx).textTheme.titleMedium),
+            Text(
+              'detail.note'.tr(),
+              style: Theme.of(ctx).textTheme.titleMedium,
+            ),
             const SizedBox(height: 16),
             TextField(
               controller: controller,
@@ -590,23 +1200,22 @@ void _showNoteInput(BuildContext context, String? current, ValueChanged<String?>
 // ---------------------------------------------------------------------------
 
 class SubDetailScreen extends HookConsumerWidget {
-  const SubDetailScreen({
-    super.key,
-    required this.slice,
-    required this.index,
-  });
+  const SubDetailScreen({super.key, required this.id});
 
-  final SubSlice slice;
-  final int index;
+  final String id;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final slicesAsync = ref.watch(subsControllerProvider);
     final settingsAsync = ref.watch(settingsControllerProvider);
 
-    final subs = slicesAsync.value;
-    final liveSlice = (subs != null && index < subs.length) ? subs[index] : slice;
-    final symbol = settingsAsync.value?.currency.symbol ?? '';
+    final liveSlice = slicesAsync.value?.where((s) => s.id == id).firstOrNull;
+    if (liveSlice == null) {
+      // Deleted (or not loaded yet); the screen is about to be popped.
+      return const Scaffold();
+    }
+    final settings = settingsAsync.value;
+    final symbol = settings?.currencyOf(liveSlice).symbol ?? '';
 
     final draft = useState<SubSlice>(liveSlice);
 
@@ -630,10 +1239,8 @@ class SubDetailScreen extends HookConsumerWidget {
     }, [liveSlice]);
 
     void saveUpdate(SubSlice updated) {
-      final currentLength = ref.read(subsControllerProvider).value?.length ?? 0;
-      if (index >= currentLength) return;
       draft.value = updated;
-      ref.read(subsControllerProvider.notifier).updateAt(index, updated);
+      ref.read(subsControllerProvider.notifier).updateSlice(updated);
     }
 
     void onSaveName() {
@@ -652,13 +1259,19 @@ class SubDetailScreen extends HookConsumerWidget {
 
     final theme = Theme.of(context);
 
-    final nextCharge = _nextChargeDate(liveSlice);
+    final nextCharge = liveSlice.nextChargeDate(DateTime.now());
     final today = DateTime.now();
     final todayMidnight = DateTime(today.year, today.month, today.day);
-    final nextChargeMidnight = DateTime(nextCharge.year, nextCharge.month, nextCharge.day);
+    final nextChargeMidnight = DateTime(
+      nextCharge.year,
+      nextCharge.month,
+      nextCharge.day,
+    );
     final daysUntil = nextChargeMidnight.difference(todayMidnight).inDays;
 
-    final history = _paymentHistory(liveSlice);
+    final main = settings?.currency ?? Currency.try_;
+    final history = _paymentHistory(liveSlice, main);
+    final priceChanges = liveSlice.priceChanges;
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -666,24 +1279,19 @@ class SubDetailScreen extends HookConsumerWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leadingWidth: 100,
+        leadingWidth: 140,
         leading: TextButton.icon(
           onPressed: () => context.pop(),
-          icon: Icon(
-            Icons.chevron_left,
-            color: theme.colorScheme.primary,
-          ),
+          icon: Icon(Icons.chevron_left, color: theme.colorScheme.primary),
           label: Text(
             'detail.back'.tr(),
             style: TextStyle(color: theme.colorScheme.primary),
           ),
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.only(left: 4),
-          ),
+          style: TextButton.styleFrom(padding: const EdgeInsets.only(left: 4)),
         ),
         actions: [
           IconButton(
-            onPressed: () => _confirmDelete(context, ref, liveSlice, index),
+            onPressed: () => _confirmDelete(context, ref, liveSlice),
             icon: Icon(Icons.delete_outline, color: theme.colorScheme.error),
           ),
         ],
@@ -699,10 +1307,10 @@ class SubDetailScreen extends HookConsumerWidget {
               nameFocusNode: nameFocusNode,
               onSaveName: onSaveName,
               onTapColor: () => _showColorPicker(
-              context,
-              draft.value.color,
-              (c) => saveUpdate(draft.value.copyWith(color: c)),
-            ),
+                context,
+                draft.value.color,
+                (c) => saveUpdate(draft.value.copyWith(color: c)),
+              ),
             ),
             const SizedBox(height: 24),
             Padding(
@@ -717,13 +1325,28 @@ class SubDetailScreen extends HookConsumerWidget {
                 onSaveAmount: onSaveAmount,
               ),
             ),
+            if (liveSlice.unpaidCharge(DateTime.now()) case final charge?) ...[
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: _PaymentDueCard(
+                  charge: charge,
+                  overdue: liveSlice.isOverdue(DateTime.now()),
+                  onMarkPaid: () => ref
+                      .read(subsControllerProvider.notifier)
+                      .markPaid(liveSlice.id, charge, paid: true),
+                ),
+              ),
+            ],
             const SizedBox(height: 28),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: _DetailsSection(
                 slice: draft.value,
-                onTapFrequency: () => _showFrequencyPicker(context, draft.value, saveUpdate),
-                onTapDate: () => _showDatePicker(context, draft.value, saveUpdate),
+                onTapFrequency: () =>
+                    _showFrequencyPicker(context, draft.value, saveUpdate),
+                onTapDate: () =>
+                    _showDatePicker(context, draft.value, saveUpdate),
                 onTapColor: () => _showColorPicker(
                   context,
                   draft.value.color,
@@ -731,30 +1354,88 @@ class SubDetailScreen extends HookConsumerWidget {
                 ),
                 onTapCategory: draft.value.brand == null
                     ? () => _showCategoryPicker(
-                          context,
-                          draft.value.category,
-                          (cat) => saveUpdate(draft.value.copyWith(category: cat)),
-                        )
+                        context,
+                        draft.value.category,
+                        (cat) =>
+                            saveUpdate(draft.value.copyWith(category: cat)),
+                      )
                     : null,
-                onTapReminder: () => _showReminderModePicker(
+                onTapReminder: () =>
+                    _showReminderPicker(context, draft.value, saveUpdate),
+                mainCurrency: settings?.currency,
+                onTapCurrency: settings == null
+                    ? null
+                    : () => _pickCurrency(
+                        context,
+                        ref,
+                        settings,
+                        draft.value,
+                        saveUpdate,
+                      ),
+                onTapShared: () =>
+                    _showSharedPicker(context, draft.value, saveUpdate),
+                onAutoRenewChanged: (v) =>
+                    saveUpdate(draft.value.copyWith(autoRenew: v)),
+                onTapManageUrl: () => _showManageUrlInput(
                   context,
-                  draft.value.reminderMode,
-                  (mode) => saveUpdate(draft.value.copyWith(reminderMode: mode)),
+                  draft.value.manageUrl,
+                  (url) => saveUpdate(draft.value.copyWith(manageUrl: url)),
                 ),
-                onTapCard: () => _showCardInput(context, draft.value.cardLastFour, (val) => saveUpdate(draft.value.copyWith(cardLastFour: val))),
-                onTapNote: () => _showNoteInput(context, draft.value.note, (val) => saveUpdate(draft.value.copyWith(note: val))),
-                onTapStatus: () => showStatusPicker(context, draft.value.status, (status) => saveUpdate(draft.value.copyWith(status: status))),
-                onTapTrialEnds: () => _showTrialEndPicker(context, draft.value.trialEndDate, (date) => saveUpdate(draft.value.copyWith(trialEndDate: date))),
+                onTapCard: () =>
+                    _showPaymentInput(context, draft.value, saveUpdate),
+                onTapNote: () => _showNoteInput(
+                  context,
+                  draft.value.note,
+                  (val) => saveUpdate(draft.value.copyWith(note: val)),
+                ),
+                onTapStatus: () => showStatusPicker(
+                  context,
+                  draft.value.status,
+                  (status) => saveUpdate(draft.value.copyWith(status: status)),
+                ),
+                onTapTrialEnds: () => _showTrialEndPicker(
+                  context,
+                  draft.value.trialEndDate,
+                  (date) =>
+                      saveUpdate(draft.value.copyWith(trialEndDate: date)),
+                ),
               ),
             ),
+            if (safeManageUri(liveSlice.manageUrl) != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                child: FilledButton.tonalIcon(
+                  onPressed: () => _openManageUrl(context, liveSlice.manageUrl),
+                  icon: const Icon(Icons.open_in_new, size: 18),
+                  label: Text('detail.manage_open'.tr()),
+                ),
+              ),
             const SizedBox(height: 28),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: _PaymentHistorySection(
                 history: history,
-                symbol: symbol,
+                onTogglePaid: (date, {required paid}) => ref
+                    .read(subsControllerProvider.notifier)
+                    .markPaid(liveSlice.id, date, paid: paid),
               ),
             ),
+            if (priceChanges.isNotEmpty) ...[
+              const SizedBox(height: 28),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: _PriceChangesSection(
+                  changes: priceChanges,
+                  main: main,
+                  onRemove: (at) => _confirmRemovePriceChange(
+                    context,
+                    () => ref
+                        .read(subsControllerProvider.notifier)
+                        .removePriceChange(liveSlice.id, at),
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 48),
           ],
         ),
@@ -803,7 +1484,9 @@ class _HeroSection extends StatelessWidget {
                     ),
                     child: Center(
                       child: Text(
-                        slice.name.isNotEmpty ? slice.name[0].toUpperCase() : '?',
+                        slice.name.isNotEmpty
+                            ? slice.name[0].toUpperCase()
+                            : '?',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 28,
@@ -829,7 +1512,8 @@ class _HeroSection extends StatelessWidget {
                             fontWeight: FontWeight.w700,
                           ),
                           cursorColor: theme.colorScheme.primary,
-                          backgroundCursorColor: theme.colorScheme.onSurfaceVariant,
+                          backgroundCursorColor:
+                              theme.colorScheme.onSurfaceVariant,
                           onSubmitted: (_) => onSaveName(),
                           textInputAction: TextInputAction.done,
                         ),
@@ -896,11 +1580,19 @@ class _StatCardsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final freqKey = slice.frequency.name.toLowerCase();
-    final freqLabel = 'frequency.short.$freqKey'.tr().toLowerCase();
-    final costSub = 'detail.per_frequency'.tr(args: [freqLabel]);
+    final costSub = slice.people > 1
+        ? '${slice.cycleLabel} · ${'detail.your_share'.tr(args: ['$symbol${slice.myAmount.toStringAsFixed(2)}'])}'
+        : slice.cycleLabel;
+    final cancelledAt = slice.cancelledAt;
+    final showSaved =
+        slice.status == SubStatus.cancelled && cancelledAt != null;
 
-    final nextSub = daysUntil == 0
+    // Paused/cancelled subscriptions have no upcoming charge.
+    final charges =
+        slice.status != SubStatus.paused && slice.status != SubStatus.cancelled;
+    final nextSub = !charges
+        ? ''
+        : daysUntil == 0
         ? 'detail.today'.tr()
         : 'detail.in_days'.tr(args: [daysUntil.toString()]);
 
@@ -914,15 +1606,35 @@ class _StatCardsRow extends StatelessWidget {
             controller: amountController,
             focusNode: amountFocusNode,
             onSave: onSaveAmount,
+            prefix: symbol,
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: _StatCard(
-            label: 'detail.next_charge'.tr(),
-            value: DateFormat('MMM d', context.locale.toString()).format(nextChargeDate),
-            sub: nextSub,
-          ),
+          child: showSaved
+              ? _StatCard(
+                  label: 'detail.saved'.tr(),
+                  value:
+                      '$symbol${(slice.savedSinceCancel(DateTime.now()) / slice.people).toStringAsFixed(2)}',
+                  sub: 'detail.saved_since'.tr(
+                    args: [
+                      DateFormat(
+                        'MMM d',
+                        context.locale.toString(),
+                      ).format(cancelledAt),
+                    ],
+                  ),
+                )
+              : _StatCard(
+                  label: 'detail.next_charge'.tr(),
+                  value: charges
+                      ? DateFormat(
+                          'MMM d',
+                          context.locale.toString(),
+                        ).format(nextChargeDate)
+                      : '—',
+                  sub: nextSub,
+                ),
         ),
       ],
     );
@@ -937,8 +1649,11 @@ class _StatCard extends StatelessWidget {
     this.controller,
     this.focusNode,
     this.onSave,
+    this.prefix,
   });
 
+  /// Shown before the editable value (the currency symbol).
+  final String? prefix;
   final String label;
   final String value;
   final String sub;
@@ -973,6 +1688,14 @@ class _StatCard extends StatelessWidget {
               onTap: () => focusNode!.requestFocus(),
               child: Row(
                 children: [
+                  if (prefix != null)
+                    Text(
+                      prefix!,
+                      style: theme.textTheme.headlineSmall!.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   Flexible(
                     child: EditableText(
                       onTapOutside: (event) {
@@ -988,7 +1711,9 @@ class _StatCard extends StatelessWidget {
                       ),
                       cursorColor: theme.colorScheme.primary,
                       backgroundCursorColor: theme.colorScheme.onSurfaceVariant,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       onSubmitted: (_) => onSave!(),
                       textInputAction: TextInputAction.done,
                     ),
@@ -1038,9 +1763,16 @@ class _DetailsSection extends StatelessWidget {
     required this.onTapStatus,
     required this.onTapTrialEnds,
     required this.onTapNote,
+    required this.onTapManageUrl,
+    required this.onTapShared,
+    required this.onAutoRenewChanged,
+    this.mainCurrency,
+    this.onTapCurrency,
   });
 
   final SubSlice slice;
+  final Currency? mainCurrency;
+  final VoidCallback? onTapCurrency;
   final VoidCallback onTapFrequency;
   final VoidCallback onTapDate;
   final VoidCallback? onTapColor;
@@ -1050,11 +1782,13 @@ class _DetailsSection extends StatelessWidget {
   final VoidCallback onTapStatus;
   final VoidCallback onTapTrialEnds;
   final VoidCallback onTapNote;
+  final VoidCallback onTapManageUrl;
+  final VoidCallback onTapShared;
+  final ValueChanged<bool> onAutoRenewChanged;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final freqKey = slice.frequency.name.toLowerCase();
     final categoryValue = slice.brand != null
         ? (slice.brand!.category ?? 'detail.not_set'.tr())
         : (slice.category ?? 'detail.not_set'.tr());
@@ -1062,7 +1796,7 @@ class _DetailsSection extends StatelessWidget {
     final rows = <Widget>[
       _DetailRow(
         label: 'detail.billing_cycle'.tr(),
-        value: 'frequency.$freqKey'.tr(),
+        value: slice.cycleLabel,
         hasChevron: true,
         onTap: onTapFrequency,
       ),
@@ -1076,15 +1810,25 @@ class _DetailsSection extends StatelessWidget {
         _DetailRow(
           label: 'detail.trial_ends'.tr(),
           value: slice.trialEndDate != null
-              ? DateFormat('MMM d, y', context.locale.toString()).format(slice.trialEndDate!)
+              ? DateFormat(
+                  'MMM d, y',
+                  context.locale.toString(),
+                ).format(slice.trialEndDate!)
               : 'detail.not_set'.tr(),
           hasChevron: true,
           onTap: onTapTrialEnds,
         ),
-      _ColorDetailRow(color: Color(slice.color), onTap: onTapColor, hasChevron: onTapColor != null),
+      _ColorDetailRow(
+        color: Color(slice.color),
+        onTap: onTapColor,
+        hasChevron: onTapColor != null,
+      ),
       _DetailRow(
         label: 'detail.started'.tr(),
-        value: DateFormat('MMM d, y', context.locale.toString()).format(slice.startDate),
+        value: DateFormat(
+          'MMM d, y',
+          context.locale.toString(),
+        ).format(slice.startDate),
         hasChevron: true,
         onTap: onTapDate,
       ),
@@ -1096,15 +1840,56 @@ class _DetailsSection extends StatelessWidget {
       ),
       _DetailRow(
         label: 'detail.payment_method'.tr(),
-        value: slice.cardLastFour != null ? '•••• ${slice.cardLastFour}' : 'detail.not_set'.tr(),
+        value: paymentLabel(
+          slice.paymentMethod,
+          slice.cardLastFour,
+          notSet: 'detail.not_set'.tr(),
+        ),
         hasChevron: true,
         onTap: onTapCard,
       ),
       _DetailRow(
         label: 'detail.reminder'.tr(),
-        value: 'detail.reminder_${slice.reminderMode.name}'.tr(),
+        value: switch (slice.remindersSnoozedUntil) {
+          final until? when until.isAfter(DateTime.now()) =>
+            'detail.snoozed_until'.tr(
+              args: [
+                DateFormat('MMM d', context.locale.toString()).format(until),
+              ],
+            ),
+          _ => slice.reminderLabel,
+        },
         hasChevron: true,
         onTap: onTapReminder,
+      ),
+      _SwitchDetailRow(
+        label: 'detail.auto_renew'.tr(),
+        value: slice.autoRenew,
+        onChanged: onAutoRenewChanged,
+      ),
+      _DetailRow(
+        label: 'detail.shared_with'.tr(),
+        value: _sharedLabel(slice.people),
+        hasChevron: true,
+        onTap: onTapShared,
+      ),
+      _DetailRow(
+        label: 'detail.currency'.tr(),
+        value: switch ((slice.currency, mainCurrency)) {
+          (final Currency c, _) => '${c.label} (${c.symbol})',
+          (null, final Currency m) => 'detail.currency_main'.tr(
+            args: [m.symbol],
+          ),
+          (null, null) => 'detail.not_set'.tr(),
+        },
+        hasChevron: onTapCurrency != null,
+        onTap: onTapCurrency,
+      ),
+      _DetailRow(
+        label: 'detail.manage_link'.tr(),
+        value: safeManageUri(slice.manageUrl)?.host ?? 'detail.not_set'.tr(),
+        hasChevron: true,
+        onTap: onTapManageUrl,
       ),
       _DetailRow(
         label: 'detail.note'.tr(),
@@ -1118,9 +1903,7 @@ class _DetailsSection extends StatelessWidget {
     for (var i = 0; i < rows.length; i++) {
       separated.add(rows[i]);
       if (i < rows.length - 1) {
-        separated.add(
-          const Divider(height: 1, indent: 16, endIndent: 16),
-        );
+        separated.add(const Divider(height: 1, indent: 16, endIndent: 16));
       }
     }
 
@@ -1143,9 +1926,7 @@ class _DetailsSection extends StatelessWidget {
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainer,
             ),
-            child: Column(
-              children: separated,
-            ),
+            child: Column(children: separated),
           ),
         ),
       ],
@@ -1200,7 +1981,11 @@ class _DetailRow extends StatelessWidget {
 }
 
 class _ColorDetailRow extends StatelessWidget {
-  const _ColorDetailRow({required this.color, this.onTap, this.hasChevron = true});
+  const _ColorDetailRow({
+    required this.color,
+    this.onTap,
+    this.hasChevron = true,
+  });
 
   final Color color;
   final VoidCallback? onTap;
@@ -1230,7 +2015,11 @@ class _ColorDetailRow extends StatelessWidget {
             ),
             if (hasChevron) ...[
               const SizedBox(width: 8),
-              Icon(Icons.chevron_right, size: 16, color: theme.colorScheme.onSurfaceVariant),
+              Icon(
+                Icons.chevron_right,
+                size: 16,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ],
           ],
         ),
@@ -1246,11 +2035,13 @@ class _ColorDetailRow extends StatelessWidget {
 class _PaymentHistorySection extends StatelessWidget {
   const _PaymentHistorySection({
     required this.history,
-    required this.symbol,
+    required this.onTogglePaid,
   });
 
-  final List<(DateTime, double)> history;
-  final String symbol;
+  final List<_Payment> history;
+
+  /// Marks a manual charge paid / unpaid.
+  final void Function(DateTime date, {required bool paid}) onTogglePaid;
 
   @override
   Widget build(BuildContext context) {
@@ -1258,8 +2049,18 @@ class _PaymentHistorySection extends StatelessWidget {
 
     final rows = <Widget>[];
     for (var i = 0; i < history.length; i++) {
-      final (date, amount) = history[i];
-      rows.add(_PaymentHistoryRow(date: date, amount: amount, symbol: symbol));
+      final p = history[i];
+      rows.add(
+        _PaymentHistoryRow(
+          date: p.date,
+          amount: p.amount,
+          symbol: p.symbol,
+          paid: p.paid,
+          onTap: p.paid == null
+              ? null
+              : () => onTogglePaid(p.date, paid: !p.paid!),
+        ),
+      );
       if (i < history.length - 1) {
         rows.add(const Divider(height: 1, indent: 16, endIndent: 16));
       }
@@ -1307,48 +2108,299 @@ class _PaymentHistoryRow extends StatelessWidget {
     required this.date,
     required this.amount,
     required this.symbol,
+    this.paid,
+    this.onTap,
   });
 
   final DateTime date;
   final double amount;
   final String symbol;
 
+  /// null: auto-renewing (shown as paid, not tappable).
+  final bool? paid;
+  final VoidCallback? onTap;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final unpaid = paid == false;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: unpaid
+                    ? theme.colorScheme.errorContainer
+                    : theme.colorScheme.surfaceContainerHighest,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                unpaid ? Icons.schedule : Icons.check,
+                size: 16,
+                color: unpaid
+                    ? theme.colorScheme.onErrorContainer
+                    : theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              DateFormat('MMM dd', context.locale.toString()).format(date),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            if (unpaid) ...[
+              const SizedBox(width: 8),
+              Text(
+                'home.unpaid'.tr(),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.error,
+                ),
+              ),
+            ],
+            const Spacer(),
+            Text(
+              '$symbol${amount.toStringAsFixed(2)}',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// "Payment due Nov 10 — Mark paid" for a manually paid subscription.
+class _PaymentDueCard extends StatelessWidget {
+  const _PaymentDueCard({
+    required this.charge,
+    required this.overdue,
+    required this.onMarkPaid,
+  });
+
+  final DateTime charge;
+  final bool overdue;
+  final VoidCallback onMarkPaid;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final date = DateFormat('MMM d', context.locale.toString()).format(charge);
+    final fg = overdue
+        ? theme.colorScheme.onErrorContainer
+        : theme.colorScheme.onSecondaryContainer;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 10, 10, 10),
+      decoration: BoxDecoration(
+        color: overdue
+            ? theme.colorScheme.errorContainer
+            : theme.colorScheme.secondaryContainer,
+        borderRadius: BorderRadius.circular(14),
+      ),
       child: Row(
         children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest,
-              shape: BoxShape.circle,
+          Icon(
+            overdue ? Icons.warning_amber_rounded : Icons.schedule,
+            color: fg,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              overdue
+                  ? 'detail.payment_overdue'.tr(args: [date])
+                  : 'detail.payment_due'.tr(args: [date]),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: fg,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            child: Icon(
-              Icons.check,
-              size: 16,
+          ),
+          FilledButton(
+            onPressed: onMarkPaid,
+            child: Text('detail.mark_paid'.tr()),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A details row with a switch instead of a chevron.
+class _SwitchDetailRow extends StatelessWidget {
+  const _SwitchDetailRow({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final String label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16, right: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(label, style: Theme.of(context).textTheme.bodyMedium),
+          ),
+          Switch.adaptive(value: value, onChanged: onChanged),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Price changes section
+// ---------------------------------------------------------------------------
+
+class _PriceChangesSection extends StatelessWidget {
+  const _PriceChangesSection({
+    required this.changes,
+    required this.main,
+    required this.onRemove,
+  });
+
+  final List<({DateTime at, Price from, Price to})> changes;
+  final Currency main;
+
+  /// Called with the change time when a row is tapped.
+  final ValueChanged<DateTime> onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final rows = <Widget>[];
+    for (var i = 0; i < changes.length; i++) {
+      final c = changes[i];
+      rows.add(
+        _PriceChangeRow(
+          at: c.at,
+          from:
+              '${(c.from.currency ?? main).symbol}${c.from.amount.toStringAsFixed(2)}',
+          to: '${(c.to.currency ?? main).symbol}${c.to.amount.toStringAsFixed(2)}',
+          // Only comparable when both prices are in the same currency.
+          increase: c.from.currency == c.to.currency
+              ? c.to.amount > c.from.amount
+              : null,
+          onTap: () => onRemove(c.at),
+        ),
+      );
+      if (i < changes.length - 1) {
+        rows.add(const Divider(height: 1, indent: 16, endIndent: 16));
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 10),
+          child: Text(
+            'detail.section_price_changes'.tr(),
+            style: theme.textTheme.labelSmall?.copyWith(
+              letterSpacing: 1.2,
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(width: 12),
-          Text(
-            DateFormat('MMM dd', context.locale.toString()).format(date),
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
+        ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainer,
             ),
+            child: Column(children: rows),
           ),
-          const Spacer(),
-          Text(
-            '$symbol${amount.toStringAsFixed(2)}',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
+        ),
+      ],
+    );
+  }
+}
+
+class _PriceChangeRow extends StatelessWidget {
+  const _PriceChangeRow({
+    required this.at,
+    required this.from,
+    required this.to,
+    required this.increase,
+    required this.onTap,
+  });
+
+  final VoidCallback onTap;
+  final DateTime at;
+  final String from;
+  final String to;
+
+  /// null when the currencies differ.
+  final bool? increase;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = switch (increase) {
+      true => theme.colorScheme.error,
+      false => Colors.green.shade600,
+      null => theme.colorScheme.onSurfaceVariant,
+    };
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                switch (increase) {
+                  true => Icons.trending_up,
+                  false => Icons.trending_down,
+                  null => Icons.swap_horiz,
+                },
+                size: 16,
+                color: color,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(width: 12),
+            Text(
+              DateFormat('MMM d, y', context.locale.toString()).format(at),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const Spacer(),
+            Text(
+              from,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+                decoration: TextDecoration.lineThrough,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              to,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

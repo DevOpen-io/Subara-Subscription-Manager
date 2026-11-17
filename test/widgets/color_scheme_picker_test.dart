@@ -34,7 +34,9 @@ void main() {
       expect(find.byIcon(Icons.check), findsOneWidget);
     });
 
-    testWidgets('tapping a dot calls onSchemeSelected with correct scheme', (tester) async {
+    testWidgets('tapping a dot calls onSchemeSelected with correct scheme', (
+      tester,
+    ) async {
       FlexScheme? selected;
       await tester.pumpWidget(
         MaterialApp(
